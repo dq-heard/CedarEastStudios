@@ -127,6 +127,7 @@
   transition: var(--transition-fast);
 }
 .nav-link:not(.btn-primary) {
+  display: block;
   color: var(--text-muted);
 }
 
