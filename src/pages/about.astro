@@ -1,0 +1,310 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import { client, urlFor } from "../sanity/client";
+import { mapSocials } from "../sanity/socials";
+import type { Header } from "../sanity/types";
+import { SEO, resolveSeo, type Seo } from "../sanity/seo";
+import { highlight } from "../utils/highlight";
+import "../styles/about.css";
+
+const HEADER = `header{ badge, title, description }`;
+
+const QUERY = `{
+  "hero": *[_type == "pageHero" && page == "about"][0]{ badge, headline, description, ${SEO} },
+  "about": *[_type == "about"][0]{
+    ${HEADER}, desc1, desc2,
+    ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal),
+    image
+  },
+  "philosophy": *[_type == "philosophy"][0]{ quote, authorName, authorRole },
+  "tech": *[_type == "techStack"][0]{ ${HEADER}, items[]{ _key, name, iconName, note } },
+  "founder": *[_type == "founder"][0]{
+    ${HEADER}, portrait, isAvailable, availableText, unavailableText,
+    leadText, bioText,
+    stats[]{ _key, label, value },
+    socialLinks[]{ _key, platform, url }
+  }
+}`;
+
+interface AboutPageData {
+  hero?: {
+    badge?: string;
+    headline?: string;
+    description?: string;
+    backgroundImage?: any;
+    seo?: Seo | null;
+  } | null;
+  about?: {
+    header?: Header;
+    desc1?: string;
+    desc2?: string;
+    ctaText?: string;
+    ctaHref?: string;
+    image?: any;
+  } | null;
+  philosophy?: {
+    quote?: string;
+    authorName?: string;
+    authorRole?: string;
+  } | null;
+  tech?: {
+    header?: Header;
+    items?: { _key: string; name?: string; iconName?: string; note?: string }[];
+  } | null;
+  founder?: {
+    header?: Header;
+    portrait?: any;
+    isAvailable?: boolean;
+    availableText?: string;
+    unavailableText?: string;
+    leadText?: string;
+    bioText?: string;
+    stats?: { _key: string; label?: string; value?: string }[];
+    socialLinks?: {
+      _key?: string;
+      platform?: string | null;
+      url?: string | null;
+    }[];
+  } | null;
+}
+
+const { hero, about, philosophy, tech, founder } =
+  await client.fetch<AboutPageData>(QUERY);
+
+const aboutImage = about?.image?.asset
+  ? {
+      url: urlFor(about.image)
+        .width(1000)
+        .height(1200)
+        .fit("crop")
+        .auto("format")
+        .url(),
+      alt: about.image.alt ?? "",
+    }
+  : null;
+
+const tools = (tech?.items ?? []).filter((t) => t.name);
+
+const portrait = founder?.portrait?.asset
+  ? {
+      url: urlFor(founder.portrait)
+        .width(800)
+        .height(1000)
+        .fit("crop")
+        .auto("format")
+        .url(),
+      alt: founder.portrait.alt ?? "",
+    }
+  : null;
+const available = founder?.isAvailable !== false;
+const availabilityText = available
+  ? founder?.availableText
+  : founder?.unavailableText;
+const stats = (founder?.stats ?? []).filter((s) => s.label && s.value);
+const socials = mapSocials(founder?.socialLinks);
+---
+
+<Layout
+  {...resolveSeo(hero?.seo, { title: "About", description: hero?.description })}
+>
+  <PageHero hero={hero} />
+
+  {
+    about && (
+      <section id="about" class="about-section" aria-labelledby="about-title">
+        <div class="container">
+          <div class="row align-items-center g-5">
+            {aboutImage && (
+              <div class="col-lg-5">
+                <div class="about-image-wrapper position-relative">
+                  <img
+                    class="about-image"
+                    src={aboutImage.url}
+                    alt={aboutImage.alt}
+                    width="1000"
+                    height="1200"
+                  />
+                </div>
+              </div>
+            )}
+            <div class:list={[aboutImage ? "col-lg-7" : "col-lg-8 mx-auto"]}>
+              <div class="about-content">
+                <SectionHeader
+                  header={about.header}
+                  id="about-title"
+                  class="about-header"
+                />
+                {about.desc1 && <p class="about-description">{about.desc1}</p>}
+                {about.desc2 && <p class="about-description">{about.desc2}</p>}
+                {about.ctaText && about.ctaHref && (
+                  <a href={about.ctaHref} class="btn btn-primary">
+                    {about.ctaText}
+                    <i class="fas fa-arrow-right" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    philosophy?.quote && (
+      <section
+        id="philosophy"
+        class="quote-section"
+        aria-label="Agency Philosophy"
+      >
+        <div class="quote-background" aria-hidden="true" />
+        <div class="container quote-container">
+          <figure class="quote-wrapper text-center mx-auto">
+            <div class="quote-mark" aria-hidden="true">
+              &ldquo;
+            </div>
+            <blockquote
+              class="quote-text"
+              set:html={highlight(philosophy.quote, "highlight")}
+            />
+            {(philosophy.authorName || philosophy.authorRole) && (
+              <figcaption class="quote-author">
+                {philosophy.authorName && (
+                  <span class="author-name">{philosophy.authorName}</span>
+                )}
+                {philosophy.authorRole && (
+                  <span class="author-role">
+                    &mdash; {philosophy.authorRole}
+                  </span>
+                )}
+              </figcaption>
+            )}
+          </figure>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    tech && tools.length > 0 && (
+      <section
+        id="tech-stack"
+        class="tech-section"
+        aria-labelledby="tech-title"
+      >
+        <div class="container">
+          <SectionHeader
+            header={tech.header}
+            id="tech-title"
+            class="section-header text-center mx-auto"
+          />
+          <ul class="row g-3 list-unstyled justify-content-center">
+            {tools.map((tool) => (
+              <li class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                  {tool.iconName && (
+                    <div class="tech-icon" aria-hidden="true">
+                      <i class={tool.iconName} />
+                    </div>
+                  )}
+                  <div>
+                    <h3 class="tech-name">{tool.name}</h3>
+                    {tool.note && <p class="tech-note">{tool.note}</p>}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    founder && (
+      <section
+        id="founder"
+        class="founder-section"
+        aria-labelledby="founder-title"
+      >
+        <div class="container">
+          <div class="row align-items-center g-5">
+            {portrait && (
+              <div class="col-lg-5">
+                <div class="founder-image-wrapper">
+                  <img
+                    class="founder-image"
+                    src={portrait.url}
+                    alt={portrait.alt}
+                    width="800"
+                    height="1000"
+                    loading="lazy"
+                  />
+                  {availabilityText && (
+                    <div class="founder-badge">
+                      <span
+                        class:list={[
+                          "badge-dot",
+                          { "is-unavailable": !available },
+                        ]}
+                        aria-hidden="true"
+                      />
+                      <span>{availabilityText}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div class:list={[portrait ? "col-lg-7" : "col-lg-8 mx-auto"]}>
+              <SectionHeader
+                header={founder.header}
+                id="founder-title"
+                class="founder-header"
+              />
+              <div class="founder-bio">
+                {founder.leadText && (
+                  <p class="lead-text">{founder.leadText}</p>
+                )}
+                {founder.bioText && <p>{founder.bioText}</p>}
+              </div>
+
+              {stats.length > 0 && (
+                <div class="row g-4 my-4 py-4 founder-stats">
+                  {stats.map((stat) => (
+                    <div class="col-6 col-sm-4">
+                      <div class="founder-stat-label">{stat.label}</div>
+                      <div class="founder-stat-value">{stat.value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {socials.length > 0 && (
+                <div class="d-flex align-items-center gap-3">
+                  <span class="connect-label">Connect:</span>
+                  <div
+                    class="founder-socials"
+                    aria-label="Founder social profiles"
+                  >
+                    {socials.map((s) => (
+                      <a
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={s.platform}
+                      >
+                        <i class={s.iconName} aria-hidden="true" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Layout>

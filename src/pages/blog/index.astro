@@ -1,0 +1,56 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PageHero from "../../components/PageHero.astro";
+import PostCard from "../../components/PostCard.astro";
+import { client } from "../../sanity/client";
+import {
+  POST_CARD_PROJECTION,
+  mapPostCard,
+  type RawPostCard,
+} from "../../sanity/posts";
+import { SEO, resolveSeo, type Seo } from "../../sanity/seo";
+import "../../styles/blog.css";
+
+const QUERY = `{
+  "hero": *[_type == "pageHero" && page == "blog"][0]{ badge, headline, description, ${SEO} },
+  "posts": *[_type == "post" && defined(slug.current)]
+    | order(publishedAt desc) ${POST_CARD_PROJECTION}
+}`;
+
+interface BlogPageData {
+  hero?: {
+    badge?: string;
+    headline?: string;
+    description?: string;
+    backgroundImage?: any;
+    seo?: Seo | null;
+  } | null;
+  posts?: RawPostCard[];
+}
+
+const data = await client.fetch<BlogPageData>(QUERY);
+const { hero } = data;
+const posts = (data.posts ?? []).map(mapPostCard);
+---
+
+<Layout
+  {...resolveSeo(hero?.seo, { title: "Blog", description: hero?.description })}
+>
+  <PageHero hero={hero} />
+
+  {
+    posts.length > 0 && (
+      <section class="blog-index-section" aria-label="Articles">
+        <div class="container">
+          <div class="row g-4">
+            {posts.map((post) => (
+              <div class="col-lg-4 col-md-6">
+                <PostCard post={post} headingLevel="h2" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Layout>

@@ -1,0 +1,203 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { client, urlFor } from "../../sanity/client";
+import { SEO, resolveSeo, type Seo } from "../../sanity/seo";
+import "../../styles/article.css";
+import "../../styles/work.css";
+
+interface Project {
+  title: string;
+  slug: string;
+  category?: string;
+  client?: string;
+  year?: number;
+  duration?: string;
+  coverImage?: any;
+  overview?: string;
+  result?: string;
+  liveUrl?: string;
+  seo?: Seo | null;
+}
+
+// One query for every project; each page gets its own project as a prop
+export async function getStaticPaths() {
+  const projects = await client.fetch<
+    Project[]
+  >(`*[_type == "caseStudy" && defined(slug.current)]
+    | order(year desc, _createdAt desc){
+    title, "slug": slug.current, category, client, year, duration, coverImage,
+    overview, result, liveUrl, ${SEO}
+  }`);
+  // Each project links to the next one in the list, wrapping around at the end
+  return projects.map((project, index) => {
+    const next =
+      projects.length > 1 ? projects[(index + 1) % projects.length] : null;
+    return {
+      params: { slug: project.slug },
+      props: {
+        project,
+        next: next
+          ? { title: next.title, slug: next.slug, category: next.category }
+          : null,
+      },
+    };
+  });
+}
+
+const { project, next } = Astro.props as {
+  project: Project;
+  next: { title: string; slug: string; category?: string } | null;
+};
+
+const cover = project.coverImage?.asset
+  ? {
+      url: urlFor(project.coverImage)
+        .width(1600)
+        .height(900)
+        .fit("crop")
+        .auto("format")
+        .url(),
+      alt: project.coverImage.alt ?? "",
+    }
+  : null;
+
+const meta = [
+  { label: "Client", value: project.client },
+  { label: "Category", value: project.category },
+  { label: "Year", value: project.year ? String(project.year) : undefined },
+  { label: "Duration", value: project.duration },
+].filter((item) => item.value);
+
+// Search-result description: the overview, cut at a word boundary
+const trim = (text = "", max = 155) =>
+  text.length <= max ? text : text.slice(0, max).replace(/\s+\S*$/, "") + "…";
+const overview = project.overview?.replace(/\s+/g, " ").trim();
+---
+
+<Layout
+  {...resolveSeo(project.seo, {
+    title: project.title,
+    description: overview ? trim(overview) : undefined,
+    image: project.coverImage,
+  })}
+>
+  <article class="post-article">
+    <header class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <a href="/work" class="post-back">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>All projects
+          </a>
+          {
+            project.category && (
+              <div>
+                <span class="post-category">{project.category}</span>
+              </div>
+            )
+          }
+          <h1 class="post-title">{project.title}</h1>
+        </div>
+      </div>
+    </header>
+
+    {
+      cover && (
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-10 mx-auto">
+              <figure class="post-cover">
+                <img
+                  src={cover.url}
+                  alt={cover.alt}
+                  width="1600"
+                  height="900"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+              </figure>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          {
+            meta.length > 0 && (
+              <dl class="case-meta row g-3">
+                {meta.map((item) => (
+                  <div class="col-6 col-md-3">
+                    <dt class="case-meta-label">{item.label}</dt>
+                    <dd class="case-meta-value">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )
+          }
+
+          {
+            project.overview && (
+              <>
+                <h2 class="case-heading">Project Overview</h2>
+                <p class="case-text">{project.overview}</p>
+              </>
+            )
+          }
+
+          {
+            project.result && (
+              <aside class="post-takeaway">
+                <p>
+                  <strong>Result:</strong> {project.result}
+                </p>
+              </aside>
+            )
+          }
+
+          {
+            project.liveUrl && (
+              <p class="mt-4">
+                <a
+                  href={project.liveUrl}
+                  class="btn btn-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Visit live site
+                  <i
+                    class="fas fa-arrow-up-right-from-square"
+                    aria-hidden="true"
+                  />
+                  <span class="visually-hidden">(opens in a new tab)</span>
+                </a>
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    {
+      next && (
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <nav class="post-nav" aria-label="More projects">
+                <a href={`/work/${next.slug}`} class="post-nav-link">
+                  <span class="post-nav-label">Next project</span>
+                  <span class="post-nav-title">{next.title}</span>
+                  {next.category && (
+                    <span class="post-nav-meta">{next.category}</span>
+                  )}
+                  <i class="fas fa-arrow-right" aria-hidden="true" />
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  </article>
+</Layout>

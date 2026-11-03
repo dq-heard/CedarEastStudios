@@ -1,0 +1,439 @@
+---
+// (Home: one query, sections composed top to bottom)
+import Layout from "../layouts/Layout.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import PostCard from "../components/PostCard.astro";
+import { client, urlFor } from "../sanity/client";
+import {
+  CASE_CARD_PROJECTION,
+  mapCaseCard,
+  type RawCaseCard,
+} from "../sanity/caseStudies";
+import {
+  POST_CARD_PROJECTION,
+  mapPostCard,
+  type RawPostCard,
+} from "../sanity/posts";
+import type { Header } from "../sanity/types";
+import { SEO, resolveSeo, type Seo } from "../sanity/seo";
+import { highlight } from "../utils/highlight";
+import "../styles/home.css";
+
+const HEADER = `header{ badge, title, description }`;
+
+const QUERY = `{
+  "hero": *[_type == "hero"][0]{
+    tag, headline, description,
+    ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal),
+    backgroundImage,
+    ${SEO}
+  },
+  "trades": *[_type == "siteSettings"][0].tradesServed,
+  "process": *[_type == "process"][0]{ ${HEADER}, steps[]{ _key, title, duration, description } },
+  "intro": *[_type == "servicesIntro"][0]{
+    ${HEADER}, ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal)
+  },
+  "services": *[_type == "service"] | order(coalesce(order, 9999) asc, _createdAt asc)[0...4]{
+    _id, title, shortDescription, iconName
+  },
+  "work": *[_type == "portfolio"][0]{ ${HEADER}, ctaText },
+  "projects": *[_type == "caseStudy" && featured == true && defined(slug.current)]
+    | order(publishedAt desc, year desc, _createdAt desc)[0...5] ${CASE_CARD_PROJECTION},
+  "testimonials": *[_type == "testimonials"][0]{
+    ${HEADER},
+    items[]{ _key, quote, rating, authorName, authorRole, avatar }
+  },
+  "newsHeader": *[_type == "news"][0]{ ${HEADER}, ctaText },
+  "posts": *[_type == "post" && defined(slug.current)]
+    | order(publishedAt desc)[0...3] ${POST_CARD_PROJECTION}
+}`;
+
+interface HomeData {
+  hero?: {
+    tag?: string;
+    headline?: string;
+    description?: string;
+    ctaText?: string;
+    ctaHref?: string;
+    backgroundImage?: any;
+    seo?: Seo | null;
+  } | null;
+  trades?: string[] | null;
+  process?: {
+    header?: Header;
+    steps?: {
+      _key: string;
+      title?: string;
+      duration?: string;
+      description?: string;
+    }[];
+  } | null;
+  intro?: { header?: Header; ctaText?: string; ctaHref?: string } | null;
+  services?: {
+    _id: string;
+    title: string;
+    shortDescription?: string;
+    iconName?: string;
+  }[];
+  work?: { header?: Header; ctaText?: string } | null;
+  projects?: RawCaseCard[];
+  testimonials?: {
+    header?: Header;
+    items?: {
+      _key: string;
+      quote?: string;
+      rating?: number;
+      authorName?: string;
+      authorRole?: string;
+      avatar?: any;
+    }[];
+  } | null;
+  newsHeader?: { header?: Header; ctaText?: string } | null;
+  posts?: RawPostCard[];
+}
+
+const data = await client.fetch<HomeData>(QUERY);
+
+const { hero, intro, work, newsHeader } = data;
+const trades = (data.trades ?? []).filter(Boolean);
+
+// "How it works": horizontal on desktop for 2-5 steps, a vertical list otherwise
+const processSteps = (data.process?.steps ?? []).filter((step) => step.title);
+const processHorizontal = processSteps.length > 1 && processSteps.length <= 5;
+const services = data.services ?? [];
+const projects = (data.projects ?? []).map(mapCaseCard);
+const posts = (data.posts ?? []).map(mapPostCard);
+
+// The hero background comes from Studio when set
+const heroBg = hero?.backgroundImage
+  ? urlFor(hero.backgroundImage).width(2400).auto("format").url()
+  : null;
+
+const testimonials = (data.testimonials?.items ?? [])
+  .filter((t) => t.quote && t.authorName)
+  .map((t) => ({
+    ...t,
+    fullStars: Math.floor(t.rating ?? 0),
+    halfStar: (t.rating ?? 0) % 1 !== 0,
+    avatarUrl: t.avatar?.asset
+      ? urlFor(t.avatar).width(96).height(96).fit("crop").auto("format").url()
+      : null,
+    avatarAlt: t.avatar?.alt || `Portrait of ${t.authorName}`,
+  }));
+---
+
+<Layout {...resolveSeo(hero?.seo, { description: hero?.description })}>
+  {
+    hero && (
+      <section
+        id="hero"
+        class="hero-section"
+        style={heroBg ? `--hero-bg: url("${heroBg}")` : undefined}
+      >
+        <div class="hero-parallax-bg" aria-hidden="true" />
+        <div class="hero-overlay" aria-hidden="true" />
+        <div class="hero-grain" aria-hidden="true" />
+        <div class="container hero-content">
+          <div class="row align-items-center">
+            <div class="col-lg-7">
+              {hero.tag && (
+                <div class="hero-tag">
+                  <span class="hero-dot" aria-hidden="true" />
+                  {hero.tag}
+                </div>
+              )}
+              {/* The home page's only h1 */}
+              {hero.headline && (
+                <h1
+                  class="hero-title"
+                  set:html={highlight(hero.headline, "highlight")}
+                />
+              )}
+              {hero.description && (
+                <p class="hero-description">{hero.description}</p>
+              )}
+              <div class="hero-btns">
+                {hero.ctaText && hero.ctaHref && (
+                  <a href={hero.ctaHref} class="btn btn-hero-primary">
+                    {hero.ctaText}
+                    <i class="fas fa-arrow-right" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="scroll-indicator" aria-hidden="true">
+          <div class="scroll-mouse" />
+          <div class="scroll-text">Scroll Down</div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    trades.length > 0 && (
+      <section class="ticker-banner" aria-label="Trades we serve">
+        <div class="ticker-track">
+          <div class="ticker-content">
+            {trades.map((item) => (
+              <div class="ticker-item">
+                <span class="ticker-dot" aria-hidden="true">
+                  ✦
+                </span>
+                {item}
+              </div>
+            ))}
+          </div>
+          {/* Identical clone for a seamless loop, hidden from screen readers */}
+          <div class="ticker-content" aria-hidden="true">
+            {trades.map((item) => (
+              <div class="ticker-item">
+                <span class="ticker-dot" aria-hidden="true">
+                  ✦
+                </span>
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    intro && services.length > 0 && (
+      <section
+        id="services-intro"
+        class="features-section"
+        aria-labelledby="services-intro-title"
+      >
+        <div class="container">
+          <SectionHeader
+            header={intro.header}
+            id="services-intro-title"
+            class="section-header text-center mx-auto"
+          />
+          <ul class="row g-4 list-unstyled">
+            {services.map((service) => (
+              <li class="col-lg-3 col-md-6">
+                <article class="feature-card">
+                  <div class="feature-icon-wrap" aria-hidden="true">
+                    <i
+                      class={service.iconName || "fas fa-check"}
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h3 class="feature-title">{service.title}</h3>
+                  {service.shortDescription && (
+                    <p class="feature-description">
+                      {service.shortDescription}
+                    </p>
+                  )}
+                </article>
+              </li>
+            ))}
+          </ul>
+          {intro.ctaText && intro.ctaHref && (
+            <div class="text-center mt-5">
+              <a href={intro.ctaHref} class="btn btn-primary">
+                {intro.ctaText}
+                <i class="fas fa-arrow-right" aria-hidden="true" />
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    processSteps.length > 0 && (
+      <section
+        id="process"
+        class="process-section"
+        aria-labelledby="process-title"
+      >
+        <div class="container">
+          <SectionHeader
+            header={data.process?.header}
+            id="process-title"
+            class="section-header text-center mx-auto"
+          />
+          <ol
+            class:list={[
+              "process-timeline",
+              { "process-timeline--horizontal": processHorizontal },
+            ]}
+            style={`--steps: ${processSteps.length}`}
+          >
+            {processSteps.map((step) => (
+              <li class="process-step">
+                {step.duration && (
+                  <div class="process-duration">{step.duration}</div>
+                )}
+                <h3 class="process-step-title">{step.title}</h3>
+                {step.description && (
+                  <p class="process-step-description">{step.description}</p>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    work && projects.length > 0 && (
+      <section
+        id="portfolio"
+        class="portfolio-section"
+        aria-labelledby="portfolio-title"
+      >
+        <div class="container">
+          <div class="row section-header align-items-end mb-5">
+            <div class="col-lg-8">
+              <SectionHeader header={work.header} id="portfolio-title" />
+            </div>
+          </div>
+          <ul class="portfolio-grid list-unstyled">
+            {projects.map((project) => (
+              <ProjectCard project={project} />
+            ))}
+          </ul>
+          {work.ctaText && (
+            <div class="text-center mt-5">
+              <a href="/work" class="btn btn-primary">
+                {work.ctaText}
+                <i class="fas fa-arrow-right" aria-hidden="true" />
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    testimonials.length > 0 && (
+      <section
+        id="testimonials"
+        class="testimonials-section"
+        aria-labelledby="testimonials-title"
+      >
+        <div class="testimonials-bg" aria-hidden="true" />
+        <div class="container position-relative z-1">
+          <div class="row section-header align-items-end mb-5">
+            <div class="col-lg-6">
+              {data.testimonials?.header?.badge && (
+                <div class="section-badge">
+                  {data.testimonials.header.badge}
+                </div>
+              )}
+              {data.testimonials?.header?.title && (
+                <h2
+                  id="testimonials-title"
+                  class="section-title text-light"
+                  set:html={highlight(data.testimonials.header.title)}
+                />
+              )}
+            </div>
+            <div class="col-lg-6 d-flex align-items-end">
+              {data.testimonials?.header?.description && (
+                <p class="section-description text-light-muted ms-auto mb-0">
+                  {data.testimonials.header.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Scroll-snap row: swipes on touch, arrow keys when focused */}
+          <div
+            class="testimonial-scroller"
+            role="region"
+            aria-label="Client testimonials"
+            tabindex="0"
+          >
+            <ul class="testimonial-track list-unstyled">
+              {testimonials.map((item) => (
+                <li class="testimonial-slide">
+                  <blockquote class="testimonial-card">
+                    <span class="testimonial-quote-mark" aria-hidden="true">
+                      &ldquo;
+                    </span>
+                    {item.rating ? (
+                      <div
+                        class="testimonial-rating"
+                        role="img"
+                        aria-label={`${item.rating} out of 5 stars`}
+                      >
+                        {Array.from({ length: item.fullStars }).map(() => (
+                          <i class="fas fa-star" aria-hidden="true" />
+                        ))}
+                        {item.halfStar && (
+                          <i class="fas fa-star-half-alt" aria-hidden="true" />
+                        )}
+                      </div>
+                    ) : null}
+                    <p class="testimonial-quote">{item.quote}</p>
+                    <footer class="testimonial-author">
+                      {item.avatarUrl && (
+                        <img
+                          class="testimonial-avatar"
+                          src={item.avatarUrl}
+                          alt={item.avatarAlt}
+                          width="96"
+                          height="96"
+                          loading="lazy"
+                        />
+                      )}
+                      <div>
+                        <cite class="testimonial-name">{item.authorName}</cite>
+                        {item.authorRole && (
+                          <span class="testimonial-company">
+                            {item.authorRole}
+                          </span>
+                        )}
+                      </div>
+                    </footer>
+                  </blockquote>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    newsHeader && posts.length > 0 && (
+      <section id="news" class="news-section" aria-labelledby="news-title">
+        <div class="container">
+          <div class="row section-header align-items-end mb-5">
+            <div class="col-lg-6">
+              <SectionHeader header={newsHeader.header} id="news-title" />
+            </div>
+            {newsHeader.ctaText && (
+              <div class="col-lg-6 text-lg-end">
+                <a href="/blog" class="btn-secondary-link">
+                  <span>{newsHeader.ctaText}</span>
+                  <i class="fas fa-arrow-right" aria-hidden="true" />
+                </a>
+              </div>
+            )}
+          </div>
+          <div class="row g-4">
+            {posts.map((post) => (
+              <div class="col-lg-4 col-md-6">
+                <PostCard post={post} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Layout>

@@ -1,0 +1,375 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import { client } from "../sanity/client";
+import { getSite } from "../sanity/site";
+import { SEO, resolveSeo, type Seo } from "../sanity/seo";
+import type { Header } from "../sanity/types";
+import {
+  PRICING_REFS_PROJECTION,
+  packageOptionLabels,
+  type PricingRefs,
+} from "../sanity/pricingRefs";
+import "../styles/contact.css";
+
+const HEADER = `header{ badge, title, description }`;
+
+const QUERY = `{
+  "hero": *[_type == "pageHero" && page == "contact"][0]{ badge, headline, description, ${SEO} },
+  "contact": *[_type == "contact"][0]{
+    ${HEADER}, formTitle, bookingTitle, bookingDescription, packageOptions,
+    nextStepsTitle, nextSteps[]{ _key, title, text }
+  },
+  "pricing": *[_type == "pricing"][0] ${PRICING_REFS_PROJECTION}
+}`;
+
+interface ContactPageData {
+  hero?: { badge?: string; headline?: string; description?: string; seo?: Seo | null } | null;
+  contact?: {
+    header?: Header; formTitle?: string; bookingTitle?: string; bookingDescription?: string;
+    packageOptions?: string[];
+    nextStepsTitle?: string; nextSteps?: { _key: string; title?: string; text?: string }[];
+  } | null;
+  pricing?: PricingRefs | null;
+}
+
+const [data, site] = await Promise.all([client.fetch<ContactPageData>(QUERY), getSite()]);
+const { hero, contact, pricing } = data;
+const { settings } = site;
+
+// Package choices come from the Pricing document, plus any extras added in Studio
+const packages = [...packageOptionLabels(pricing), ...(contact?.packageOptions ?? [])];
+
+// The calendar is embedded on this page. Cal.com wants "username/event", not the full URL.
+const booking = settings.bookingUrl;
+let calLink = "";
+try {
+  if (booking) calLink = new URL(booking).pathname.replace(/^\/+|\/+$/g, "");
+} catch {}
+const socials = settings.socials ?? [];
+const nextSteps = (contact?.nextSteps ?? []).filter((step) => step.title);
+const hasSidebar = Boolean(
+  nextSteps.length > 0 || settings.supportEmail || settings.responseTimeText || socials.length > 0
+);
+---
+
+<Layout hideCta {...resolveSeo(hero?.seo, { title: "Contact", description: hero?.description })}>
+  <PageHero hero={hero} />
+
+  {calLink && (
+    <section
+      id="book"
+      class="booking-section"
+      aria-labelledby={contact?.bookingTitle ? "booking-title" : undefined}
+      aria-label={contact?.bookingTitle ? undefined : "Book a call"}
+    >
+      <div class="container">
+        <div class="booking-header text-center mx-auto">
+          <SectionHeader
+            header={{ title: contact?.bookingTitle, description: contact?.bookingDescription }}
+            id="booking-title"
+            class="text-center"
+          />
+        </div>
+        <!-- Cal.com loads into this box only once it's near the screen -->
+        <div id="calEmbed" class="cal-embed" data-cal-link={calLink}>
+          <noscript>
+            <p class="cal-fallback"><a href={booking}>Open the calendar</a></p>
+          </noscript>
+        </div>
+        <p class="cal-fallback">
+          Calendar not loading? <a href={booking} target="_blank" rel="noopener noreferrer">Open it in a new tab<span class="visually-hidden"> (opens in a new tab)</span></a>.
+        </p>
+      </div>
+    </section>
+  )}
+
+  <section
+    id="contact"
+    class="contact-section"
+    aria-labelledby={contact?.header?.title ? "contact-title" : undefined}
+    aria-label={contact?.header?.title ? undefined : "Contact"}
+  >
+    <div class="container">
+      <SectionHeader header={contact?.header} id="contact-title" class="section-header text-center mx-auto mb-5" />
+
+      <div class="row g-5 align-items-start">
+        <!-- The form is the main path, so it comes first in the page order -->
+        <div class:list={[hasSidebar ? "col-lg-8" : "col-lg-8 mx-auto"]}>
+          <div id="send-message" class="contact-form-wrapper">
+            {contact?.formTitle && <h3 class="contact-card-title">{contact.formTitle}</h3>}
+
+            <form id="contactForm" action="/api/contact" method="post" data-email={settings.supportEmail}>
+              <!-- Honeypot: hidden from people and screen readers, bots fill it in -->
+              <div class="hp-field" inert>
+                <label for="contactWebsite">Website</label>
+                <input type="text" id="contactWebsite" name="website" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="contactFirstName" class="form-label">
+                    First Name <span class="required-star" aria-hidden="true">*</span>
+                  </label>
+                  <input type="text" id="contactFirstName" name="firstName" class="form-control" autocomplete="given-name" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="contactLastName" class="form-label">
+                    Last Name <span class="required-star" aria-hidden="true">*</span>
+                  </label>
+                  <input type="text" id="contactLastName" name="lastName" class="form-control" autocomplete="family-name" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="contactEmail" class="form-label">
+                    E-mail Address <span class="required-star" aria-hidden="true">*</span>
+                  </label>
+                  <input type="email" id="contactEmail" name="email" class="form-control" autocomplete="email" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="contactCompany" class="form-label">Company / Business Name</label>
+                  <input type="text" id="contactCompany" name="company" class="form-control" autocomplete="organization" />
+                </div>
+                {packages.length > 0 && (
+                  <div class="col-12">
+                    <label for="contactService" class="form-label">Package Interest</label>
+                    <select id="contactService" name="service" class="form-select">
+                      <option value="">Select a package</option>
+                      {packages.map((pkg) => <option value={pkg}>{pkg}</option>)}
+                    </select>
+                  </div>
+                )}
+                <div class="col-12">
+                  <label for="contactMessage" class="form-label">
+                    Project Details <span class="required-star" aria-hidden="true">*</span>
+                  </label>
+                  <textarea
+                    id="contactMessage"
+                    name="message"
+                    class="form-control"
+                    placeholder="Tell me about your business, what kind of jobs you want more of, and anything about your current site."
+                    maxlength="5000"
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="col-12 mt-4">
+                  <button type="submit" class="btn-submit-primary" id="contactSubmitBtn">
+                    <span>Send Message</span><i class="fas fa-paper-plane" aria-hidden="true"></i>
+                  </button>
+                  <!-- Always in the page so screen readers announce the result -->
+                  <div id="contactStatus" class="contact-form-status" role="status" aria-live="polite"></div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {hasSidebar && (
+          <div class="col-lg-4 order-lg-first">
+            <div class="contact-info-list">
+              {nextSteps.length > 0 && (
+                <div class="contact-next">
+                  {contact?.nextStepsTitle && <h3 class="contact-card-title">{contact.nextStepsTitle}</h3>}
+                  <ol class="contact-next-list">
+                    {nextSteps.map((step) => (
+                      <li>
+                        <span class="contact-next-title">{step.title}</span>
+                        {step.text && <span class="contact-next-text">{step.text}</span>}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {settings.supportEmail && (
+                <div class="contact-info-item">
+                  <div class="contact-info-icon" aria-hidden="true"><i class="fas fa-envelope"></i></div>
+                  <div>
+                    <div class="contact-info-label">Direct E-mail</div>
+                    <a href={`mailto:${settings.supportEmail}`} class="contact-info-value">{settings.supportEmail}</a>
+                  </div>
+                </div>
+              )}
+
+              {settings.responseTimeText && (
+                <div class="contact-info-item">
+                  <div class="contact-info-icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
+                  <div>
+                    <div class="contact-info-label">Response Time</div>
+                    <div class="contact-info-value">{settings.responseTimeText}</div>
+                  </div>
+                </div>
+              )}
+
+              {socials.length > 0 && (
+                <div class="contact-socials-wrapper">
+                  <div class="contact-info-label mb-2">Connect</div>
+                  <div class="contact-socials" aria-label="Social profiles">
+                    {socials.map((s) => (
+                      <a href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.platform}>
+                        <i class={s.iconName} aria-hidden="true"></i>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const form = document.getElementById("contactForm") as HTMLFormElement | null;
+  const status = document.getElementById("contactStatus");
+  const button = document.getElementById("contactSubmitBtn") as HTMLButtonElement | null;
+
+  function show(kind: "success" | "error", message: string) {
+    if (!status || !form) return;
+    status.className = `contact-form-status is-${kind}`;
+    status.textContent = message;
+    // On errors, point to the email address as a fallback
+    const email = form.dataset.email;
+    if (kind === "error" && email) {
+      const link = document.createElement("a");
+      link.href = `mailto:${email}`;
+      link.textContent = email;
+      status.append(" You can also email ", link, ".");
+    }
+  }
+
+  if (form && button) {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const idle = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+      if (status) status.textContent = "";
+
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        const result = await res.json().catch(() => null);
+        if (res.ok && result?.ok) {
+          location.assign("/thank-you?type=form");
+          return;
+        } else {
+          show("error", result?.error ?? "Something went wrong.");
+        }
+      } catch {
+        show("error", "Couldn't reach the server.");
+      } finally {
+        button.disabled = false;
+        button.innerHTML = idle;
+      }
+    });
+
+    // Without JavaScript the endpoint redirects back here with ?status=
+    const result = new URLSearchParams(location.search).get("status");
+    if (result === "error") show("error", "Your message couldn't be sent.");
+  }
+
+  // ---- Cal.com embed, loaded when the calendar section is about to scroll into view ----
+  // true: the calendar follows the site theme (rebuilds on toggle)
+  // false: the calendar stays dark in both themes
+  const CAL_FOLLOWS_THEME = true;
+
+  let calBox = document.getElementById("calEmbed");
+  const calLink = calBox?.dataset.calLink;
+  let calStarted = false;
+
+  const calTheme = () =>
+    !CAL_FOLLOWS_THEME ||
+    document.documentElement.getAttribute("data-theme") === "dark"
+      ? "dark"
+      : "light";
+
+  const renderCal = () => {
+    const Cal = (window as any).Cal;
+    const theme = calTheme();
+    Cal("inline", {
+      elementOrSelector: "#calEmbed",
+      calLink,
+      config: { layout: "month_view", theme },
+    });
+    Cal("ui", { theme, hideEventTypeDetails: false, layout: "month_view" });
+  };
+
+  const startCal = () => {
+    if (calStarted || !calLink) return;
+    calStarted = true;
+
+    // Cal.com's standard loader: queues commands, then pulls in embed.js
+    (function (C: any, A: string, L: string) {
+      const p = (a: any, ar: any) => a.q.push(ar);
+      const d = C.document;
+      C.Cal =
+        C.Cal ||
+        function (...ar: any[]) {
+          const cal = C.Cal;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            (d.head.appendChild(d.createElement("script")) as HTMLScriptElement).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api: any = function (...args: any[]) { p(api, args); };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        };
+    })(window, "https://app.cal.com/embed/embed.js", "init");
+
+    const Cal = (window as any).Cal;
+    Cal("init", { origin: "https://app.cal.com" });
+    renderCal();
+
+    // After a booking, send them to the thank-you page (the lead is counted there)
+    Cal("on", {
+      action: "bookingSuccessfulV2",
+      callback: () => location.assign("/thank-you?type=booking"),
+    });
+  };
+
+  // Theme toggle: swap in a fresh container and render the embed again
+  if (CAL_FOLLOWS_THEME) {
+    window.addEventListener("themechange", () => {
+      if (!calStarted || !calBox) return; // not loaded yet, so startCal will read the current theme
+      const fresh = calBox.cloneNode(false) as HTMLElement;
+      calBox.replaceWith(fresh);
+      calBox = fresh;
+      renderCal();
+    });
+  }
+
+  if (calBox && calLink) {
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            startCal();
+          }
+        },
+        { rootMargin: "600px 0px" }
+      );
+      observer.observe(calBox);
+    } else {
+      startCal();
+    }
+  }
+</script>

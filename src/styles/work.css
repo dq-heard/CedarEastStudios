@@ -1,0 +1,53 @@
+/* src/styles/work.css  (/work index and /work/[slug]) */
+
+/* ---------- Index ---------- */
+.work-index-section {
+  padding: 100px 0 120px;
+  background: var(--surface-base);
+}
+
+@media (min-width: 992px) {
+  /* Uniform cards on /work; the home page bento sets its own sizes */
+  .portfolio-grid--index {
+    grid-auto-rows: 280px;
+  }
+}
+
+/* ---------- Project page (header, cover and callout come from article.css) ---------- */
+.case-meta {
+  margin: 0 0 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.case-meta-label {
+  margin-bottom: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.case-meta-value {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.case-heading {
+  margin: 0 0 0.7em;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-main);
+}
+
+.case-text {
+  margin-bottom: 1.4em;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+  white-space: pre-line; /* keeps paragraph breaks typed in Studio */
+}

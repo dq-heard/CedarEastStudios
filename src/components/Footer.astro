@@ -1,0 +1,143 @@
+---
+import type { Site } from "../sanity/site";
+import { highlight } from "../utils/highlight";
+
+const { site } = Astro.props as { site: Site };
+const { settings, footer, services, legal, hasWork, hasPosts } = site;
+const socials = settings.socials ?? [];
+---
+
+<footer id="footer" class="footer-section">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4">
+        <a
+          id="footer-brand-title"
+          class="footer-brand"
+          href="/"
+          aria-label={`${settings.agencyName}, home`}
+          set:html={highlight(settings.brandName)}
+        />
+        {
+          footer.brandDescription && (
+            <p class="footer-description">{footer.brandDescription}</p>
+          )
+        }
+        {
+          socials.length > 0 && (
+            <div class="footer-socials" aria-label="Social media links">
+              {socials.map((s) => (
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.platform}
+                >
+                  <i class={s.iconName} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div class="col-lg-3 col-md-4 col-6">
+        <h2 class="footer-heading">Services</h2>
+        <nav aria-label="Services">
+          <ul class="footer-links list-unstyled">
+            {
+              services.map((s) => (
+                <li>
+                  <a href="/services">{s.title}</a>
+                </li>
+              ))
+            }
+            <li><a href="/services#pricing">Service Packages</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="col-lg-2 col-md-4 col-6">
+        <h2 class="footer-heading">Company</h2>
+        <nav aria-label="Company">
+          <ul class="footer-links list-unstyled">
+            <li><a href="/about">About</a></li>
+            {
+              hasWork && (
+                <li>
+                  <a href="/work">Work</a>
+                </li>
+              )
+            }
+            <li><a href="/services#faq">FAQ</a></li>
+            {
+              hasPosts && (
+                <li>
+                  <a href="/blog">Insights</a>
+                </li>
+              )
+            }
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="col-lg-3 col-md-4">
+        <h2 class="footer-heading">Direct Contact</h2>
+        {
+          settings.bookingUrl && footer.bookingButtonText && (
+            <a href="/contact#book" class="btn btn-primary footer-booking">
+              <i class="fas fa-calendar-check" aria-hidden="true" />
+              {footer.bookingButtonText}
+            </a>
+          )
+        }
+        {
+          settings.supportEmail && (
+            <div class="footer-contact-item">
+              <i class="fas fa-envelope" aria-hidden="true" />
+              <a
+                href={`mailto:${settings.supportEmail}`}
+                class="footer-contact-link"
+              >
+                {settings.supportEmail}
+              </a>
+            </div>
+          )
+        }
+        {
+          settings.responseTimeText && (
+            <div class="footer-contact-item">
+              <i class="fas fa-clock" aria-hidden="true" />
+              <span>{settings.responseTimeText}</span>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <hr class="footer-divider" aria-hidden="true" />
+
+  <div class="container">
+    <div class="footer-bottom">
+      <div class="footer-copyright">
+        &copy; {new Date().getFullYear()}{" "}{settings.agencyName}.{" "}
+        {footer.copyrightText}
+      </div>
+      {
+        legal.length > 0 && (
+          <nav aria-label="Legal">
+            <ul class="footer-bottom-links list-unstyled mb-0">
+              {legal.map((page) => (
+                <li>
+                  <a href={`/${page.slug}`}>{page.title}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,34 @@
+---
+// Badge + title + description from a sectionHeader object. The page decides the grid around it.
+import { highlight } from "../utils/highlight";
+
+interface Props {
+  header?: { badge?: string; title?: string; description?: string } | null;
+  as?: "h1" | "h2";
+  id?: string; // lets the section use aria-labelledby
+  class?: string;
+}
+
+const { header, as: Tag = "h2", id, class: className } = Astro.props;
+---
+
+{
+  header && (header.badge || header.title || header.description) && (
+    <div class:list={["section-header-block", className]}>
+      {header.badge && <div class="section-badge">{header.badge}</div>}
+      {header.title && (
+        <Tag id={id} class="section-title" set:html={highlight(header.title)} />
+      )}
+      {header.description && (
+        <p class="section-description">{header.description}</p>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .text-center .section-description {
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>

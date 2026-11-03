@@ -1,0 +1,323 @@
+/* (/contact: form, sidebar, booking card) */
+
+/* ==================== CONTACT ==================== */
+.contact-section {
+  padding: 120px 0;
+  background: var(--surface-base);
+}
+
+/* Honeypot field: off-screen for everyone, bots still fill it in */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.contact-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contact-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.contact-info-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.contact-info-label {
+  margin-bottom: 2px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.contact-info-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: color var(--transition-fast);
+}
+a.contact-info-value:hover,
+a.contact-info-value:focus-visible {
+  color: var(--color-primary);
+}
+a.contact-info-value:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.contact-card-title {
+  margin-bottom: 8px;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.contact-form-wrapper .contact-card-title {
+  margin-bottom: 24px;
+  font-size: 1.4rem;
+}
+.contact-socials-wrapper {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+.contact-socials {
+  display: flex;
+  gap: 10px;
+}
+.contact-socials a {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+.contact-socials a:hover,
+.contact-socials a:focus-visible {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.contact-socials a:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* ==================== FORM ==================== */
+.contact-form-wrapper {
+  padding: 44px;
+  background: var(--surface-card);
+  border: 1px solid
+    color-mix(in srgb, var(--border-color) 85%, var(--text-main));
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06);
+  scroll-margin-top: 100px;
+}
+
+.required-star {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.form-label {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.contact-form-wrapper .form-control,
+.contact-form-wrapper .form-select {
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  color: var(--text-main);
+  background: var(--surface-base);
+  border: 1.5px solid
+    color-mix(in srgb, var(--border-color) 90%, var(--text-main));
+  border-radius: var(--radius-sm);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.contact-form-wrapper .form-control::placeholder {
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+.contact-form-wrapper .form-control:hover,
+.contact-form-wrapper .form-select:hover {
+  border-color: var(--color-primary);
+}
+.contact-form-wrapper .form-control:focus,
+.contact-form-wrapper .form-select:focus {
+  background: var(--surface-card);
+  border-color: var(--color-primary);
+  color: var(--text-main);
+  box-shadow: 0 0 0 3.5px
+    color-mix(in srgb, var(--color-primary) 20%, transparent);
+  outline: none;
+}
+
+textarea.form-control {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.btn-submit-primary {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 100px;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.btn-submit-primary:hover,
+.btn-submit-primary:focus-visible {
+  background: color-mix(in srgb, var(--color-primary) 88%, black);
+  border-color: color-mix(in srgb, var(--color-primary) 88%, black);
+  box-shadow: var(--shadow-md);
+}
+.btn-submit-primary:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+.btn-submit-primary:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.contact-form-status:not(:empty) {
+  margin: 16px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.contact-form-status.is-success {
+  color: var(--color-primary);
+}
+.contact-form-status.is-error {
+  color: color-mix(in srgb, #d92d20 85%, var(--text-main));
+}
+.contact-form-status a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+/* ==================== SIDEBAR ==================== */
+.contact-next {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+.contact-next-list {
+  counter-reset: next;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contact-next-list li {
+  counter-increment: next;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 18px 44px;
+}
+.contact-next-list li:last-child {
+  padding-bottom: 0;
+}
+.contact-next-list li::before {
+  content: counter(next);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-radius: 50%;
+}
+.contact-next-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+.contact-next-text {
+  margin-top: 2px;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* ==================== BOOK A CALL (embedded calendar) ==================== */
+.booking-section {
+  padding: 100px 0 120px;
+  background: var(--surface-sunken);
+  scroll-margin-top: 80px;
+}
+
+.booking-header {
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+/* The calendar sizes itself; this only caps its width and reserves some height so the page
+   doesn't jump while it loads. The padding inside the calendar belongs to Cal.com. */
+.cal-embed {
+  max-width: 1040px;
+  min-height: 480px;
+  margin: 0 auto;
+}
+
+.cal-fallback {
+  margin: 16px 0 0;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+.cal-fallback a {
+  color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 767px) {
+  .contact-form-wrapper {
+    padding: 28px 20px;
+  }
+}
+
+@media (max-width: 575px) {
+  .contact-socials {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-socials a:hover,
+  .contact-socials a:focus-visible {
+    transform: none;
+  }
+}

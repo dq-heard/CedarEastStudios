@@ -1,0 +1,147 @@
+---
+import "../styles/globals.css";
+import "../styles/layout.css";
+import { getSite } from "../sanity/site";
+import { urlFor } from "../sanity/client";
+import Topbar from "../components/Topbar.astro";
+import Navbar from "../components/Navbar.astro";
+import Prefooter from "../components/Prefooter.astro";
+import Footer from "../components/Footer.astro";
+import ScrollTop from "../components/ScrollTop.astro";
+import Cursor from "../components/Cursor.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: any; // a Sanity image; falls back to the site's default share image
+  noindex?: boolean;
+  hideCta?: boolean; // true on pages that shouldn't show the prefooter (e.g. /contact)
+  ogType?: "website" | "article";
+}
+
+const {
+  title,
+  description,
+  image,
+  noindex = false,
+  hideCta = false,
+  ogType = "website",
+} = Astro.props;
+const site = await getSite();
+const { settings } = site;
+
+// "About" -> "About | CedarEast Studios". Titles that already name the agency are left alone.
+const withAgency = (t: string) =>
+  settings.agencyName && !t.includes(settings.agencyName)
+    ? `${t} | ${settings.agencyName}`
+    : t;
+const pageTitle = title
+  ? withAgency(title)
+  : (settings.seoTitle ?? settings.agencyName);
+const pageDescription = description ?? settings.seoDescription;
+
+const ogSource = image ?? settings.ogImage;
+const ogImage = ogSource
+  ? urlFor(ogSource).width(1200).height(630).fit("crop").auto("format").url()
+  : undefined;
+
+// Needs `site` in astro.config; without it the canonical and og:url tags are skipped
+const canonical = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).href
+  : undefined;
+
+// Business details for search engines, from Site Settings
+const jsonLd = settings.agencyName
+  ? {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      name: settings.agencyName,
+      url: Astro.site?.href,
+      description: settings.seoDescription,
+      email: settings.supportEmail,
+      telephone: settings.phoneNumber,
+      address: settings.address,
+      image: ogImage,
+      sameAs: settings.socials?.map((s) => s.url),
+    }
+  : null;
+// Escape "<" so the JSON can never close the script tag
+const jsonLdText = jsonLd
+  ? JSON.stringify(jsonLd).replace(/</g, "\\u003c")
+  : null;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    {
+      site.hasPosts && (
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${settings.agencyName ?? "Blog"} Blog`}
+          href="/rss.xml"
+        />
+      )
+    }
+    <title>{pageTitle}</title>
+    {pageDescription && <meta name="description" content={pageDescription} />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content={ogType} />
+    {
+      settings.agencyName && (
+        <meta property="og:site_name" content={settings.agencyName} />
+      )
+    }
+    <meta property="og:locale" content="en_US" />
+    {pageTitle && <meta property="og:title" content={pageTitle} />}
+    {
+      pageDescription && (
+        <meta property="og:description" content={pageDescription} />
+      )
+    }
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta
+      name="twitter:card"
+      content={ogImage ? "summary_large_image" : "summary"}
+    />
+
+    {jsonLdText && <script type="application/ld+json" set:html={jsonLdText} />}
+    <!-- Page-specific head content (e.g. Article JSON-LD): <script slot="head" ...> -->
+    <slot name="head" />
+
+    <!-- Runs before first paint so the saved theme has no flash -->
+    <script is:inline>
+      (function () {
+        var t = null;
+        try {
+          t = localStorage.getItem("ceTheme");
+        } catch (e) {}
+        if (t !== "dark" && t !== "light") {
+          t = matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="visually-hidden-focusable" href="#main">Skip to content</a>
+    <Topbar settings={settings} />
+    <Navbar site={site} />
+    <main id="main">
+      <slot />
+    </main>
+    {!hideCta && <Prefooter data={site.prefooter} />}
+    <Footer site={site} />
+    <ScrollTop />
+    <Cursor />
+  </body>
+</html>

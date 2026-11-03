@@ -1,0 +1,61 @@
+---
+// (Home news teaser and /blog)
+import { formatPostDate, type PostCardData } from "../sanity/posts";
+import "../styles/cards.css";
+
+interface Props {
+  post: PostCardData;
+  /** h3 under a section title (home), h2 under the page h1 (/blog) */
+  headingLevel?: "h2" | "h3";
+}
+const { post, headingLevel: Heading = "h3" } = Astro.props;
+---
+
+<article class="news-card">
+  <a href={`/blog/${post.slug}`} class="news-card-trigger">
+    {
+      post.imageUrl && (
+        <div class="news-image-wrapper">
+          <img
+            class="news-image"
+            src={post.imageUrl}
+            alt={post.imageAlt}
+            width="1200"
+            height="800"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      )
+    }
+    <div class="news-card-body">
+      {post.category && <span class="news-category">{post.category}</span>}
+      <Heading class="news-card-title">{post.title}</Heading>
+      {post.excerpt && <p class="news-excerpt">{post.excerpt}</p>}
+      <div class="news-meta">
+        {
+          post.publishedAt && (
+            <span class="news-meta-item">
+              <i class="fas fa-calendar" aria-hidden="true" />
+              <time datetime={post.publishedAt}>
+                {formatPostDate(post.publishedAt)}
+              </time>
+            </span>
+          )
+        }
+        {
+          post.readTime && (
+            <span class="news-meta-item">
+              <i class="fas fa-clock" aria-hidden="true" />
+              <span>{post.readTime}</span>
+            </span>
+          )
+        }
+      </div>
+      <div class="news-read-more" aria-hidden="true">
+        <span>Read Article</span>
+        <i class="fas fa-arrow-right"></i>
+      </div>
+    </div>
+  </a>
+</article>

@@ -1,0 +1,22 @@
+<button
+  id="scrollTopBtn"
+  class="scroll-top-btn"
+  type="button"
+  aria-label="Scroll to top of page"
+>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</button>
+
+<script>
+  const btn = document.getElementById("scrollTopBtn");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  const update = () =>
+    btn?.classList.toggle("is-visible", window.scrollY > 300);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+
+  btn?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: reduced.matches ? "auto" : "smooth" });
+  });
+</script>

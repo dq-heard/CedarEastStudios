@@ -1,0 +1,64 @@
+---
+// (the global call to action; the Layout renders it on every page)
+import type { Site } from "../sanity/site";
+import { highlight } from "../utils/highlight";
+
+const { data } = Astro.props as { data: Site["prefooter"] };
+const header = data?.header;
+
+// A button that points at the page you're already on is left out (/services#pricing counts as /services)
+const here = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isHere = (href?: string) =>
+  Boolean(href) &&
+  ((href as string).split("#")[0].replace(/\/$/, "") || "/") === here;
+
+const primary =
+  data?.primaryLabel && data?.primaryHref && !isHere(data.primaryHref);
+const secondary =
+  data?.secondaryLabel && data?.secondaryHref && !isHere(data.secondaryHref);
+---
+
+{
+  data && header?.title && (
+    <section
+      id="cta-bottom"
+      class="cta-bottom-section"
+      aria-labelledby="cta-bottom-title"
+    >
+      <div class="cta-bottom-pattern" aria-hidden="true" />
+      <div class="container cta-bottom-content">
+        <div class="row align-items-center">
+          <div class="col-lg-7">
+            {header.badge && (
+              <div class="section-badge cta-badge">{header.badge}</div>
+            )}
+            <h2
+              id="cta-bottom-title"
+              class="cta-bottom-title"
+              set:html={highlight(header.title, "cta-highlight")}
+            />
+            {header.description && (
+              <p class="cta-bottom-description">{header.description}</p>
+            )}
+          </div>
+          <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
+            <div class="d-flex gap-3 justify-content-lg-end flex-wrap align-items-center">
+              {primary && (
+                <a href={data.primaryHref} class="btn-cta-primary">
+                  <span>{data.primaryLabel}</span>
+                  <i class="fas fa-arrow-right" aria-hidden="true" />
+                </a>
+              )}
+              {secondary && (
+                <a href={data.secondaryHref} class="btn-cta-secondary">
+                  <i class="fas fa-tags" aria-hidden="true" />
+                  <span>{data.secondaryLabel}</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

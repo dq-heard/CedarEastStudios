@@ -1,0 +1,54 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PageHero from "../../components/PageHero.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { client } from "../../sanity/client";
+import {
+  CASE_CARD_PROJECTION,
+  mapCaseCard,
+  type RawCaseCard,
+} from "../../sanity/caseStudies";
+import { SEO, resolveSeo, type Seo } from "../../sanity/seo";
+import "../../styles/work.css";
+
+const QUERY = `{
+  "hero": *[_type == "pageHero" && page == "work"][0]{ badge, headline, description, ${SEO} },
+  "projects": *[_type == "caseStudy" && defined(slug.current)]
+    | order(year desc, _createdAt desc) ${CASE_CARD_PROJECTION}
+}`;
+
+interface WorkPageData {
+  hero?: {
+    badge?: string;
+    headline?: string;
+    description?: string;
+    backgroundImage?: any;
+    seo?: Seo | null;
+  } | null;
+  projects?: RawCaseCard[];
+}
+
+const data = await client.fetch<WorkPageData>(QUERY);
+const { hero } = data;
+const projects = (data.projects ?? []).map(mapCaseCard);
+---
+
+<Layout
+  {...resolveSeo(hero?.seo, { title: "Work", description: hero?.description })}
+>
+  <PageHero hero={hero} />
+
+  {
+    projects.length > 0 && (
+      <section class="work-index-section" aria-label="Projects">
+        <div class="container">
+          <ul class="portfolio-grid portfolio-grid--index list-unstyled">
+            {projects.map((project) => (
+              <ProjectCard project={project} headingLevel="h2" uniform />
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+</Layout>

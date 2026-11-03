@@ -1,0 +1,5 @@
+/*(/blog index; the post page uses article.css) */
+.blog-index-section {
+  padding: 100px 0 120px;
+  background: var(--surface-base);
+}

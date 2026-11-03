@@ -1,0 +1,86 @@
+---
+import type { Site } from "../sanity/site";
+const { settings } = Astro.props as { settings: Site["settings"] };
+const socials = settings.socials ?? [];
+---
+
+<aside id="topbar" class="topbar" aria-label="Contact and Social Information">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7 topbar-contact">
+        {
+          settings.supportEmail && (
+            <a href={`mailto:${settings.supportEmail}`}>
+              <i class="fas fa-envelope" aria-hidden="true" />
+              {settings.supportEmail}
+            </a>
+          )
+        }
+        {
+          settings.address && (
+            <span>
+              <i class="fas fa-map-marker-alt" aria-hidden="true" />
+              {settings.address}
+            </span>
+          )
+        }
+      </div>
+      <div class="col-lg-5">
+        <div class="topbar-actions">
+          {
+            socials.length > 0 && (
+              <div class="topbar-social" aria-label="Social Media Links">
+                {socials.map((s) => (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.platform}
+                  >
+                    <i class={s.iconName} aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
+            )
+          }
+          <!-- No aria-label: the visible text is the accessible name -->
+          <button class="theme-toggle-btn" id="themeBtn" type="button">
+            <div class="theme-icon-wrap" aria-hidden="true">
+              <i class="fas fa-sun" id="themeIcon"></i>
+            </div>
+            <span id="themeLabel">Dark Mode</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  const btn = document.getElementById("themeBtn");
+  const icon = document.getElementById("themeIcon");
+  const label = document.getElementById("themeLabel");
+
+  const paint = (theme: string) => {
+    icon?.classList.toggle("fa-sun", theme === "dark");
+    icon?.classList.toggle("fa-moon", theme !== "dark");
+    if (label)
+      label.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+  };
+
+  paint(document.documentElement.getAttribute("data-theme") || "light");
+
+  btn?.addEventListener("click", () => {
+    const next =
+      (document.documentElement.getAttribute("data-theme") || "light") ===
+      "light"
+        ? "dark"
+        : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    try {
+      localStorage.setItem("ceTheme", next);
+    } catch {}
+    window.dispatchEvent(new CustomEvent("themechange", { detail: next }));
+    paint(next);
+  });
+</script>

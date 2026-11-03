@@ -1,0 +1,301 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import { client } from "../sanity/client";
+import { getSite } from "../sanity/site";
+import { formatPeriod, formatPrice, formatPriceParts } from "../sanity/price";
+import { buildPriceTokens, fillTokens } from "../sanity/pricingRefs";
+import type { Header } from "../sanity/types";
+import { SEO, resolveSeo, type Seo } from "../sanity/seo";
+import "../styles/services.css";
+
+const HEADER = `header{ badge, title, description }`;
+const HREF = (field: string) => `"ctaHref": coalesce(${field}.external, ${field}.internal)`;
+
+const QUERY = `{
+  "hero": *[_type == "pageHero" && page == "services"][0]{ badge, headline, description, ${SEO} },
+  "intro": *[_type == "servicesSection"][0]{ ${HEADER} },
+  "services": *[_type == "service"] | order(coalesce(order, 9999) asc, _createdAt asc){
+    _id, title, iconName, tags, shortDescription, description,
+    subServices[]{ _key, title, description }
+  },
+  "pricing": *[_type == "pricing"][0]{
+    ${HEADER},
+    tiers[]{
+      _key, tierName, "key": key.current, isPopular, popularBadgeText, pricePrefix, price, description, features,
+      ctaText, ${HREF("ctaLink")}
+    },
+    retainer{ badge, title, description, price, interval, ctaText, ${HREF("ctaLink")} }
+  },
+  "faq": *[_type == "faq"][0]{ ${HEADER}, ctaText, items[]{ _key, question, answer } }
+}`;
+
+interface ServicesPageData {
+  hero?: { badge?: string; headline?: string; description?: string; seo?: Seo | null } | null;
+  intro?: { header?: Header } | null;
+  services?: {
+    _id: string; title?: string; iconName?: string; tags?: string[];
+    shortDescription?: string; description?: string;
+    subServices?: { _key: string; title?: string; description?: string }[];
+  }[];
+  pricing?: {
+    header?: Header;
+    tiers?: {
+      _key: string; tierName?: string; key?: string; isPopular?: boolean; popularBadgeText?: string;
+      pricePrefix?: string; price?: number; description?: string; features?: string[];
+      ctaText?: string; ctaHref?: string;
+    }[];
+    retainer?: {
+      badge?: string; title?: string; description?: string; price?: number;
+      interval?: string; ctaText?: string; ctaHref?: string;
+    } | null;
+  } | null;
+  faq?: { header?: Header; ctaText?: string; items?: { _key: string; question?: string; answer?: string }[] } | null;
+}
+
+const [data, site] = await Promise.all([client.fetch<ServicesPageData>(QUERY), getSite()]);
+const { hero, intro, services: rawServices, pricing, faq } = data;
+
+// FAQ answers can use price tokens such as {{growth.price}}
+const tokens = buildPriceTokens({ tiers: pricing?.tiers, retainer: pricing?.retainer ?? undefined });
+const faqItems = (faq?.items ?? [])
+  .filter((item) => item.question && item.answer)
+  .map((item) => ({ ...item, answer: fillTokens(item.answer, tokens) }));
+const booking = site.settings.bookingUrl;
+
+// A card only opens a modal when there is something to show beyond the card itself
+const services = (rawServices ?? [])
+  .filter((s) => s.title)
+  .map((s, i) => {
+    const subServices = (s.subServices ?? []).filter((x) => x.title);
+    return {
+      ...s,
+      number: String(i + 1).padStart(2, "0"),
+      modalId: `service-modal-${i}`,
+      subServices,
+      hasDetails: Boolean(s.description || subServices.length),
+    };
+  });
+
+const tiers = (pricing?.tiers ?? []).filter((t) => t.tierName);
+const retainer = pricing?.retainer?.title ? pricing.retainer : null;
+const showPricing = tiers.length > 0 || Boolean(retainer);
+---
+
+<Layout {...resolveSeo(hero?.seo, { title: "Services", description: hero?.description })}>
+  <PageHero hero={hero} />
+
+  {services.length > 0 && (
+    <section id="services" class="services-section" aria-labelledby="services-title">
+      <div class="container">
+        <SectionHeader header={intro?.header} id="services-title" class="section-header text-center mx-auto" />
+
+        <ul class="row g-4 list-unstyled">
+          {services.map((service) => (
+            <li class="col-lg-4 col-md-6">
+              <article class="service-card">
+                {service.hasDetails && (
+                  <div class="service-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></div>
+                )}
+                <div class="service-number" aria-hidden="true">{service.number}</div>
+                {service.iconName && (
+                  <div class="service-icon-wrap" aria-hidden="true"><i class={service.iconName}></i></div>
+                )}
+                <h3 class="service-title">
+                  {service.hasDetails ? (
+                    <button
+                      type="button"
+                      class="service-card-link"
+                      data-open-dialog={service.modalId}
+                      aria-haspopup="dialog"
+                    >
+                      {service.title}
+                    </button>
+                  ) : (
+                    service.title
+                  )}
+                </h3>
+                {service.shortDescription && <p class="service-description">{service.shortDescription}</p>}
+                {service.tags && service.tags.length > 0 && (
+                  <ul class="service-tag-list list-unstyled" aria-label="Service topics">
+                    {service.tags.map((tag) => <li class="service-tag">{tag}</li>)}
+                  </ul>
+                )}
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {services.filter((s) => s.hasDetails).map((service) => (
+        <dialog id={service.modalId} class="service-modal" aria-labelledby={`${service.modalId}-title`}>
+          <div class="modal-header">
+            <h2 id={`${service.modalId}-title`} class="modal-title">{service.title}</h2>
+            <button type="button" class="modal-close" data-close-dialog aria-label="Close">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            {service.iconName && (
+              <div class="modal-service-icon" aria-hidden="true"><i class={service.iconName}></i></div>
+            )}
+            {service.description && <p class="modal-description">{service.description}</p>}
+            {service.subServices.length > 0 && (
+              <>
+                <h3 class="modal-subtitle">What&rsquo;s Included:</h3>
+                <ul class="row g-3 list-unstyled">
+                  {service.subServices.map((sub) => (
+                    <li class="col-md-6">
+                      <div class="sub-service-card">
+                        <h4 class="sub-service-title">
+                          <i class="fas fa-check sub-service-check" aria-hidden="true"></i>{sub.title}
+                        </h4>
+                        {sub.description && <p class="sub-service-description">{sub.description}</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </dialog>
+      ))}
+    </section>
+  )}
+
+  {showPricing && (
+    <section id="pricing" class="pricing-section" aria-labelledby="pricing-title">
+      <div class="container">
+        <SectionHeader header={pricing?.header} id="pricing-title" class="section-header text-center mx-auto" />
+
+        {tiers.length > 0 && (
+          <div class="row g-4 justify-content-center align-items-stretch mb-5">
+            {tiers.map((tier) => {
+              const { symbol, value } = formatPriceParts(tier.price);
+              const features = (tier.features ?? []).filter(Boolean);
+              return (
+                <div class="col-lg-4 col-md-6">
+                  <div class:list={["pricing-card", { featured: tier.isPopular }]}>
+                    {tier.isPopular && tier.popularBadgeText && (
+                      <div class="pricing-popular-badge">{tier.popularBadgeText}</div>
+                    )}
+                    <h3 class="pricing-tier">{tier.tierName}</h3>
+                    {value && (
+                      <div class="pricing-price-wrapper">
+                        {tier.pricePrefix && <span class="pricing-prefix">{tier.pricePrefix}</span>}
+                        <div class="pricing-amount-group">
+                          {symbol && <span class="pricing-currency">{symbol}</span>}
+                          <span class="pricing-amount">{value}</span>
+                        </div>
+                      </div>
+                    )}
+                    {tier.description && <p class="pricing-description">{tier.description}</p>}
+                    <div class="pricing-divider"></div>
+                    {features.length > 0 && (
+                      <ul class="pricing-features list-unstyled">
+                        {features.map((feature) => (
+                          <li><i class="fas fa-check-circle" aria-hidden="true"></i>{feature}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {tier.ctaText && tier.ctaHref && (
+                      <a href={tier.ctaHref} class="btn-pricing">{tier.ctaText}</a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {retainer && (
+          <div class="row">
+            <div class="col-lg-10 mx-auto">
+              <div class="pricing-retainer-banner">
+                <div class="row align-items-center g-4">
+                  <div class="col-lg-7">
+                    {retainer.badge && <div class="retainer-badge">{retainer.badge}</div>}
+                    <h3 class="retainer-title">{retainer.title}</h3>
+                    {retainer.description && <p class="retainer-desc">{retainer.description}</p>}
+                  </div>
+                  <div class="col-lg-5 text-lg-end">
+                    {formatPrice(retainer.price) && (
+                      <div class="retainer-price">
+                        <span class="retainer-amt">{formatPrice(retainer.price)}</span>{" "}
+                        <span class="retainer-per">{formatPeriod(retainer.interval)}</span>
+                      </div>
+                    )}
+                    {retainer.ctaText && retainer.ctaHref && (
+                      <a href={retainer.ctaHref} class="btn-retainer mt-3">{retainer.ctaText}</a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  {faqItems.length > 0 && (
+    <section
+      id="faq"
+      class="faq-section"
+      aria-labelledby={faq?.header?.title ? "faq-title" : undefined}
+      aria-label={faq?.header?.title ? undefined : "Frequently asked questions"}
+    >
+      <div class="container">
+        <div class="row align-items-start g-5">
+          <div class="col-lg-5">
+            <div class="faq-sidebar">
+              <SectionHeader header={faq?.header} id="faq-title" class="mb-4" />
+              {booking && faq?.ctaText && (
+                <a href="/contact#book" class="btn-primary-link">
+                  <span>{faq.ctaText}</span><i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </a>
+              )}
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <!-- Native <details>: no script needed. Same name = opening one closes the others. -->
+            <div class="faq-list">
+              {faqItems.map((item, index) => (
+                <details class="faq-item" name="faq" open={index === 0}>
+                  <summary class="faq-summary">
+                    <h3 class="faq-question">{item.question}</h3>
+                  </summary>
+                  <div class="faq-answer">{item.answer}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+</Layout>
+
+<script>
+  // Native <dialog> handles Escape, focus trapping, the inert background and returning focus.
+  document.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+
+    const opener = target.closest<HTMLElement>("[data-open-dialog]");
+    if (opener) {
+      const dialog = document.getElementById(opener.dataset.openDialog ?? "");
+      if (dialog instanceof HTMLDialogElement) dialog.showModal();
+      return;
+    }
+
+    if (target.closest("[data-close-dialog]")) {
+      target.closest("dialog")?.close();
+      return;
+    }
+
+    // The dialog fills its own box, so a click that lands on the dialog itself hit the backdrop
+    if (target instanceof HTMLDialogElement) target.close();
+  });
+</script>

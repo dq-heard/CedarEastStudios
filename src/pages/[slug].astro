@@ -1,0 +1,69 @@
+---
+// src/pages/[slug].astro  (/privacy, /terms and any other Legal Page document)
+// Static routes such as /about and /work take priority; this only catches the legal slugs.
+import Layout from "../layouts/Layout.astro";
+import { client } from "../sanity/client";
+import { renderBody } from "../utils/portableText";
+import "../styles/article.css";
+
+interface LegalPage {
+  title: string;
+  slug: string;
+  updatedAt?: string;
+  body?: unknown[];
+}
+
+export async function getStaticPaths() {
+  const pages = await client.fetch<
+    LegalPage[]
+  >(`*[_type == "legalPage" && defined(slug.current)]{
+    title, "slug": slug.current, updatedAt, body
+  }`);
+  return pages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: LegalPage };
+const bodyHtml = renderBody(page.body);
+// "2026-10-31" -> "October 31, 2026" (parsed as UTC so the day can't shift)
+const updated = page.updatedAt
+  ? new Intl.DateTimeFormat("en-US", {
+      dateStyle: "long",
+      timeZone: "UTC",
+    }).format(new Date(page.updatedAt))
+  : null;
+---
+
+<Layout title={page.title} hideCta>
+  <article class="post-article">
+    <header class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <h1 class="post-title">{page.title}</h1>
+          {
+            updated && (
+              <p class="post-meta">
+                <span>
+                  <i class="fas fa-calendar" aria-hidden="true" />
+                  Last updated <time datetime={page.updatedAt}>{updated}</time>
+                </span>
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </header>
+
+    {
+      bodyHtml && (
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 mx-auto post-body" set:html={bodyHtml} />
+          </div>
+        </div>
+      )
+    }
+  </article>
+</Layout>

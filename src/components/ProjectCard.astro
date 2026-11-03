@@ -1,0 +1,45 @@
+---
+// (Home work section and /work)
+import type { CaseCardData } from "../sanity/caseStudies";
+import "../styles/cards.css";
+
+interface Props {
+  project: CaseCardData;
+  /** h3 under a section title (home), h2 under the page h1 (/work) */
+  headingLevel?: "h2" | "h3";
+  /** true on /work: every card is the same size (the Studio grid-size setting is for the home bento) */
+  uniform?: boolean;
+}
+const { project, headingLevel: Heading = "h3", uniform = false } = Astro.props;
+---
+
+<li class:list={["portfolio-grid-item", !uniform && project.layoutClass]}>
+  <a href={`/work/${project.slug}`} class="portfolio-item">
+    {
+      project.imageUrl && (
+        <img
+          class="portfolio-image"
+          src={project.imageUrl}
+          alt={project.imageAlt}
+          width="1200"
+          height="900"
+          loading="lazy"
+          decoding="async"
+        />
+      )
+    }
+    <div class="portfolio-overlay">
+      <div>
+        {
+          project.category && (
+            <div class="portfolio-category">{project.category}</div>
+          )
+        }
+        <Heading class="portfolio-name">{project.title}</Heading>
+      </div>
+    </div>
+    <div class="portfolio-action-badge" aria-hidden="true">
+      <i class="fas fa-arrow-right"></i>
+    </div>
+  </a>
+</li>

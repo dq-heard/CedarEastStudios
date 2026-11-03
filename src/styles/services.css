@@ -1,0 +1,654 @@
+/* src/styles/services.css (Services page: service cards, modal, pricing) */
+
+/* ==================== SERVICES ==================== */
+.services-section {
+  padding: 100px 0;
+  background: var(--surface-sunken);
+}
+
+.service-card {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  padding: 36px 32px;
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  border: 1px solid
+    color-mix(in srgb, var(--border-color) 85%, var(--text-main));
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: var(--transition-smooth);
+}
+
+/* Accent line along the bottom edge */
+.service-card::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: var(--transition-smooth);
+}
+
+.service-card:hover::before,
+.service-card:has(.service-card-link:focus-visible)::before {
+  transform: scaleX(1);
+}
+
+.service-card:hover,
+.service-card:has(.service-card-link:focus-visible) {
+  transform: translateY(-8px);
+  border-color: var(--color-primary);
+  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.12);
+}
+
+.service-card:has(.service-card-link:focus-visible) {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The title is the real button; its ::after stretches over the whole card */
+.service-card-link {
+  all: unset;
+  cursor: pointer;
+}
+.service-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.service-number {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 18px;
+  color: color-mix(in srgb, var(--text-main) 12%, transparent);
+  transition: var(--transition-smooth);
+}
+.service-card:hover .service-number {
+  color: color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.service-icon-wrap {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+.service-card:hover .service-icon-wrap {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.service-title {
+  font-size: 1.28rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+.service-description {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+}
+
+.service-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+.service-tag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface-card));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-radius: 100px;
+}
+
+.service-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  border: 1px solid
+    color-mix(in srgb, var(--border-color) 85%, var(--text-main));
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+}
+.service-card:hover .service-arrow {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  transform: rotate(-45deg);
+}
+
+/* ==================== SERVICE MODAL (native <dialog>) ==================== */
+/* The <dialog> is the card itself: header pinned on top, body scrolls. The browser centers it
+   and draws the backdrop. These are scoped to .service-modal so Bootstrap's own .modal-* rules lose. */
+dialog.service-modal {
+  /* Centering is spelled out because a global reset (margin: 0) removes the browser's own */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(800px, calc(100% - 2rem));
+  height: fit-content;
+  max-height: calc(100dvh - 3rem);
+  padding: 0;
+  color: var(--text-main);
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+}
+dialog.service-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+.service-modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+body:has(.service-modal[open]) {
+  overflow: hidden;
+}
+
+.service-modal .modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 28px;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border-color);
+}
+.service-modal .modal-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-main);
+}
+.service-modal .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+.service-modal .modal-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.service-modal .modal-close:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.service-modal .modal-close:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.modal-service-icon {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: var(--radius-md);
+}
+.modal-description {
+  margin-bottom: 22px;
+  line-height: 1.82;
+  color: var(--text-muted);
+}
+.modal-subtitle {
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.sub-service-card {
+  height: 100%;
+  padding: 16px 20px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+.sub-service-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.sub-service-check {
+  margin-right: 8px;
+  font-size: 0.85rem;
+  color: var(--color-primary);
+}
+.sub-service-description {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* ==================== PRICING ==================== */
+.pricing-section {
+  padding: 120px 0;
+  background: var(--surface-base);
+}
+
+.pricing-card {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 32px;
+  background: var(--surface-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  transition:
+    transform var(--transition-smooth),
+    border-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
+}
+.pricing-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+.pricing-card.featured {
+  background: var(--surface-sunken);
+  border: 2px solid var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.pricing-popular-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 18px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: 100px;
+}
+
+.pricing-tier {
+  margin-bottom: 16px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.pricing-prefix {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.pricing-amount-group {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+.pricing-currency {
+  margin-right: 2px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.pricing-amount {
+  font-family: var(--font-heading);
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.pricing-description {
+  margin-bottom: 24px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.pricing-divider {
+  height: 1px;
+  margin-bottom: 24px;
+  background: var(--border-color);
+}
+
+.pricing-features {
+  flex-grow: 1;
+  margin-bottom: 32px;
+}
+.pricing-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.pricing-features li i {
+  flex-shrink: 0;
+  margin-top: 3px;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.btn-pricing {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  border: 1.5px solid var(--border-color);
+  border-radius: 100px;
+  transition: var(--transition-fast);
+}
+.btn-pricing:hover,
+.btn-pricing:focus-visible {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  outline: none;
+}
+.btn-pricing:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.pricing-card.featured .btn-pricing {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.pricing-card.featured .btn-pricing:hover {
+  background: color-mix(in srgb, var(--color-primary) 88%, black);
+  border-color: color-mix(in srgb, var(--color-primary) 88%, black);
+}
+
+/* Retainer banner */
+.pricing-retainer-banner {
+  padding: 32px 40px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+.retainer-badge {
+  margin-bottom: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+.retainer-title {
+  margin-bottom: 8px;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.retainer-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.retainer-amt {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+.retainer-per {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.btn-retainer {
+  display: inline-block;
+  padding: 10px 24px;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  border-radius: 100px;
+  transition: var(--transition-fast);
+}
+.btn-retainer:hover,
+.btn-retainer:focus-visible {
+  background: var(--color-primary);
+  color: #fff;
+  outline: none;
+}
+.btn-retainer:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 991px) {
+  .pricing-retainer-banner {
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .pricing-retainer-banner .text-lg-end {
+    margin-top: 20px;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 575px) {
+  .pricing-amount {
+    font-size: 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .pricing-card {
+    transition: none;
+  }
+  .service-card:hover,
+  .service-card:has(.service-card-link:focus-visible),
+  .pricing-card:hover {
+    transform: none;
+  }
+  .service-card:hover .service-arrow {
+    transform: none;
+  }
+}
+
+/* ==================== FAQ ==================== */
+.faq-section {
+  padding: 120px 0;
+  background: var(--surface-sunken);
+  overflow: visible; /* a global `section { overflow: hidden }` would stop the sticky sidebar */
+}
+
+.faq-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.faq-item {
+  overflow: hidden;
+  background: var(--surface-card);
+  border: 1px solid
+    color-mix(in srgb, var(--border-color) 80%, var(--text-main));
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color var(--transition-fast);
+}
+.faq-item:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary) 35%,
+    var(--border-color)
+  );
+}
+
+.faq-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 28px;
+  list-style: none;
+  cursor: pointer;
+  background: var(--surface-card);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+.faq-summary::-webkit-details-marker {
+  display: none;
+}
+.faq-summary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* +/- indicator */
+.faq-summary::after {
+  content: "+";
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--text-muted);
+  transition:
+    transform var(--transition-fast),
+    color var(--transition-fast);
+}
+.faq-item[open] > .faq-summary {
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--surface-card));
+}
+.faq-item[open] > .faq-summary::after {
+  content: "\2013";
+  color: var(--color-primary);
+}
+
+.faq-question {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-main);
+}
+.faq-item[open] .faq-question {
+  color: var(--color-primary);
+}
+
+.faq-answer {
+  padding: 16px 28px 24px;
+  font-size: 0.92rem;
+  line-height: 1.8;
+  white-space: pre-line; /* keeps paragraph breaks typed in Studio */
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-primary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-primary);
+  transition: gap var(--transition-fast);
+}
+.btn-primary-link:hover,
+.btn-primary-link:focus-visible {
+  gap: 14px;
+}
+.btn-primary-link:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 991px) {
+  .faq-sidebar {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary-link {
+    transition: none;
+  }
+}

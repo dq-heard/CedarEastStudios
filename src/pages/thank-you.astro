@@ -1,0 +1,167 @@
+---
+// /thank-you?type=booking or ?type=form. Excluded from search and from the sitemap (see astro.config).
+import Layout from "../layouts/Layout.astro";
+import { client } from "../sanity/client";
+import { getSite } from "../sanity/site";
+
+interface Variant {
+  title?: string;
+  intro?: string;
+  next?: string;
+  ready?: string;
+}
+
+const [data, site] = await Promise.all([
+  client.fetch<{
+    booked?: Variant;
+    form?: Variant;
+    linkText?: string;
+    linkHref?: string;
+  } | null>(`
+    *[_type == "thankYou"][0]{
+      booked, form, linkText, "linkHref": coalesce(link.external, link.internal)
+    }`),
+  getSite(),
+]);
+
+const variants = [
+  { key: "booking", content: data?.booked },
+  { key: "form", content: data?.form },
+].filter((v) => v.content?.title);
+
+const showLink = Boolean(data?.linkText && data?.linkHref);
+---
+
+<Layout title="Thank you" noindex hideCta>
+  <section class="thanks-section" aria-labelledby="thanks-title">
+    <div class="container">
+      {
+        variants.map((v, i) => (
+          <div
+            class="thanks-card"
+            data-thanks={v.key}
+            hidden={v.key !== "form" && variants.length > 1}
+          >
+            <p class="thanks-check" aria-hidden="true">
+              <i class="fas fa-check" />
+            </p>
+            <h1 class="thanks-title" id={i === 0 ? "thanks-title" : undefined}>
+              {v.content?.title}
+            </h1>
+            {v.content?.intro && <p class="thanks-intro">{v.content.intro}</p>}
+            {v.content?.next && (
+              <div class="thanks-block">
+                <h2>What happens next</h2>
+                <p>{v.content.next}</p>
+              </div>
+            )}
+            {v.content?.ready && (
+              <div class="thanks-block">
+                <h2>Please have ready</h2>
+                <p>{v.content.ready}</p>
+              </div>
+            )}
+          </div>
+        ))
+      }
+
+      {
+        showLink && (
+          <p class="thanks-link">
+            <a href={data?.linkHref} class="btn-primary-link">
+              <>
+                <span>{data?.linkText}</span>
+                <i class="fas fa-arrow-right" aria-hidden="true" />
+              </>
+            </a>
+          </p>
+        )
+      }
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Show the matching version; the form version is the default
+  const type =
+    new URLSearchParams(location.search).get("type") === "booking"
+      ? "booking"
+      : "form";
+  const cards = document.querySelectorAll<HTMLElement>("[data-thanks]");
+  const match = [...cards].some((c) => c.dataset.thanks === type);
+  cards.forEach((c) => {
+    c.hidden = match ? c.dataset.thanks !== type : false;
+  });
+  // Hand the lead to analytics code: listen for "lead" on window
+  window.dispatchEvent(new CustomEvent("lead", { detail: { type } }));
+</script>
+
+<style>
+  .thanks-section {
+    padding: 140px 0 160px;
+    background: var(--surface-base);
+  }
+  .thanks-card {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .thanks-card[hidden] {
+    display: none;
+  }
+  .thanks-check {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  }
+  .thanks-title {
+    margin: 0 0 12px;
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+    color: var(--text-main);
+  }
+  .thanks-intro {
+    margin: 0 0 28px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+  .thanks-block {
+    margin: 0 0 20px;
+    text-align: left;
+  }
+  .thanks-block h2 {
+    margin: 0 0 4px;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-main);
+  }
+  .thanks-block p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+  .thanks-link {
+    margin: 32px 0 0;
+    text-align: center;
+  }
+  .btn-primary-link {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-primary);
+  }
+  .btn-primary-link i {
+    margin-left: 8px;
+  }
+  .btn-primary-link:hover,
+  .btn-primary-link:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

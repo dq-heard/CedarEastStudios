@@ -1,0 +1,241 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { client, urlFor } from "../../sanity/client";
+import { SEO, resolveSeo, type Seo } from "../../sanity/seo";
+import PostCard from "../../components/PostCard.astro";
+import {
+  formatPostDate,
+  readTimeLabel,
+  mapPostCard,
+  type RawPostCard,
+} from "../../sanity/posts";
+import { renderBody } from "../../utils/portableText";
+import "../../styles/article.css";
+
+interface Post {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  category?: string;
+  authorName?: string;
+  publishedAt?: string;
+  _updatedAt?: string;
+  mainImage?: any;
+  imageAlt?: string;
+  keyTakeaway?: string;
+  body?: unknown[];
+  readMinutes?: number | null;
+  seo?: Seo | null;
+}
+
+// One query for every post; each page gets its own post as a prop
+export async function getStaticPaths() {
+  const posts = await client.fetch<
+    Post[]
+  >(`*[_type == "post" && defined(slug.current)] | order(publishedAt desc){
+    _id, title, "slug": slug.current, excerpt, category, authorName, publishedAt, _updatedAt,
+    mainImage, "imageAlt": mainImage.alt, keyTakeaway,
+    body[]{ ..., _type == "imageWithAlt" => { ..., "dimensions": asset->metadata.dimensions{ width, height } } },
+    "readMinutes": round(length(pt::text(body)) / 5 / 200),
+    ${SEO}
+  }`);
+  // Related: same category first, then the newest of the rest. Up to three.
+  return posts.map((post) => {
+    const others = posts.filter((other) => other.slug !== post.slug);
+    const related = [
+      ...others.filter(
+        (other) => post.category && other.category === post.category
+      ),
+      ...others.filter(
+        (other) => !(post.category && other.category === post.category)
+      ),
+    ]
+      .slice(0, 3)
+      // Card fields only, so the full article bodies aren't copied into every page
+      .map(
+        ({
+          _id,
+          title,
+          slug,
+          excerpt,
+          category,
+          publishedAt,
+          mainImage,
+          imageAlt,
+          readMinutes,
+        }) => ({
+          _id,
+          title,
+          slug,
+          excerpt,
+          category,
+          publishedAt,
+          mainImage,
+          imageAlt,
+          readMinutes,
+        })
+      );
+    return { params: { slug: post.slug }, props: { post, related } };
+  });
+}
+
+const { post, related } = Astro.props as { post: Post; related: RawPostCard[] };
+const relatedCards = related.map(mapPostCard);
+
+const cover = post.mainImage?.asset
+  ? {
+      url: urlFor(post.mainImage)
+        .width(1600)
+        .height(900)
+        .fit("crop")
+        .auto("format")
+        .url(),
+      alt: post.mainImage.alt ?? "",
+    }
+  : null;
+
+const bodyHtml = renderBody(post.body);
+const readTime = readTimeLabel(post.readMinutes);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.title,
+  description: post.excerpt,
+  datePublished: post.publishedAt,
+  dateModified: post._updatedAt,
+  ...(post.authorName
+    ? { author: { "@type": "Person", name: post.authorName } }
+    : {}),
+  ...(cover ? { image: cover.url } : {}),
+  ...(Astro.site
+    ? { mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href }
+    : {}),
+};
+// Escape "<" so the JSON can never close the script tag
+const jsonLdText = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
+---
+
+<Layout
+  {...resolveSeo(post.seo, {
+    title: post.title,
+    description: post.excerpt,
+    image: post.mainImage,
+  })}
+  ogType="article"
+>
+  <script slot="head" type="application/ld+json" set:html={jsonLdText} />
+  {
+    post.publishedAt && (
+      <meta
+        slot="head"
+        property="article:published_time"
+        content={post.publishedAt}
+      />
+    )
+  }
+
+  <article class="post-article">
+    <header class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <a href="/blog" class="post-back">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>All articles
+          </a>
+          {
+            post.category && (
+              <div>
+                <span class="post-category">{post.category}</span>
+              </div>
+            )
+          }
+          <h1 class="post-title">{post.title}</h1>
+          {
+            (post.publishedAt || readTime || post.authorName) && (
+              <p class="post-meta">
+                {post.publishedAt && (
+                  <span>
+                    <i class="fas fa-calendar" aria-hidden="true" />
+                    <time datetime={post.publishedAt}>
+                      {formatPostDate(post.publishedAt)}
+                    </time>
+                  </span>
+                )}
+                {readTime && (
+                  <span>
+                    <i class="fas fa-clock" aria-hidden="true" />
+                    {readTime}
+                  </span>
+                )}
+                {post.authorName && (
+                  <span>
+                    <i class="fas fa-user" aria-hidden="true" />
+                    {post.authorName}
+                  </span>
+                )}
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </header>
+
+    {
+      cover && (
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-10 mx-auto">
+              <figure class="post-cover">
+                <img
+                  src={cover.url}
+                  alt={cover.alt}
+                  width="1600"
+                  height="900"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+              </figure>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto post-body">
+          {bodyHtml && <div set:html={bodyHtml} />}
+          {
+            post.keyTakeaway && (
+              <aside class="post-takeaway">
+                <p>
+                  <strong>Key Takeaway:</strong> {post.keyTakeaway}
+                </p>
+              </aside>
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    {
+      relatedCards.length > 0 && (
+        <div class="container">
+          <section class="post-related" aria-labelledby="related-title">
+            <h2 id="related-title" class="post-related-title">
+              Keep reading
+            </h2>
+            <div class="row g-4">
+              {relatedCards.map((card) => (
+                <div class="col-lg-4 col-md-6">
+                  <PostCard post={card} />
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )
+    }
+  </article>
+</Layout>

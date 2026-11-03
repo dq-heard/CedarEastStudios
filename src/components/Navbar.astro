@@ -1,0 +1,112 @@
+---
+import type { Site } from "../sanity/site";
+import { highlight } from "../utils/highlight";
+
+const { site } = Astro.props as { site: Site };
+const { settings, nav } = site;
+
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+// Nested routes keep their parent highlighted (/blog/my-post -> Blog)
+const isActive = (href: string) => {
+  const target = (href || "/").split("#")[0] || "/";
+  return target === "/"
+    ? path === "/"
+    : path === target || path.startsWith(`${target}/`);
+};
+const cta = nav.cta?.label && nav.cta?.href ? nav.cta : null;
+---
+
+<nav id="navbar" class="navbar navbar-expand-lg" aria-label="Main">
+  <div class="container">
+    <a
+      class="navbar-brand"
+      href="/"
+      aria-label={`${settings.agencyName}, home`}
+      set:html={highlight(settings.brandName)}
+    />
+
+    <button
+      class="navbar-toggler collapsed"
+      type="button"
+      aria-controls="navMenu"
+      aria-expanded="false"
+      aria-label="Toggle navigation menu"
+    >
+      <div class="navbar-toggler-wrap" aria-hidden="true">
+        <span class="navbar-toggler-line"></span>
+        <span class="navbar-toggler-line"></span>
+        <span class="navbar-toggler-line"></span>
+      </div>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-center" id="navMenu">
+      <ul class="navbar-nav gap-1">
+        {
+          nav.items.map((item) => (
+            <li class="nav-item">
+              <a
+                class:list={["nav-link", { active: isActive(item.href) }]}
+                href={item.href || "/"}
+                aria-current={isActive(item.href) ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        {
+          /* The desktop button is hidden on small screens, so the menu gets its own */
+        }
+        {
+          cta && (
+            <li class="nav-item d-lg-none">
+              <a class="nav-link nav-cta" href={cta.href}>
+                {cta.label}
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true" />
+              </a>
+            </li>
+          )
+        }
+      </ul>
+    </div>
+
+    {
+      cta && (
+        <a
+          href={cta.href}
+          class="nav-link nav-cta ms-3 d-none d-lg-inline-flex"
+        >
+          {cta.label}
+          <i class="fas fa-arrow-right ms-2 mt-1" aria-hidden="true" />
+        </a>
+      )
+    }
+  </div>
+</nav>
+
+<script>
+  const nav = document.getElementById("navbar");
+  const toggler = nav?.querySelector<HTMLButtonElement>(".navbar-toggler");
+  const menu = document.getElementById("navMenu");
+
+  const setOpen = (open: boolean) => {
+    menu?.classList.toggle("show", open);
+    toggler?.classList.toggle("collapsed", !open);
+    toggler?.setAttribute("aria-expanded", String(open));
+  };
+
+  toggler?.addEventListener("click", () =>
+    setOpen(!menu?.classList.contains("show"))
+  );
+  // Following a link closes the menu
+  menu?.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("a")) setOpen(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+
+  const onScroll = () => nav?.classList.toggle("scrolled", window.scrollY > 50);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+</script>

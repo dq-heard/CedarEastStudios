@@ -1,0 +1,48 @@
+---
+// The h1 band at the top of every inner page (About, Services, Work, Blog, Contact).
+// Data comes from the pageHero document whose "page" field matches the route.
+import { getSite } from "../sanity/site";
+import { urlFor } from "../sanity/client";
+import { highlight } from "../utils/highlight";
+import "../styles/pagehero.css";
+
+interface Props {
+  hero?: {
+    badge?: string;
+    headline?: string;
+    description?: string;
+  } | null;
+}
+const { hero } = Astro.props;
+const { settings } = await getSite();
+const bg = settings.pageHeroImage
+  ? urlFor(settings.pageHeroImage).width(2000).auto("format").url()
+  : null;
+---
+
+{
+  hero?.headline && (
+    <section
+      class="page-hero"
+      style={bg ? `--page-hero-bg: url("${bg}")` : undefined}
+    >
+      <div class="page-hero-bg" aria-hidden="true" />
+      <div class="page-hero-overlay" aria-hidden="true" />
+      <div class="container page-hero-content">
+        {hero.badge && (
+          <div class="page-hero-tag">
+            <span class="page-hero-dot" aria-hidden="true" />
+            {hero.badge}
+          </div>
+        )}
+        <h1
+          class="page-hero-title"
+          set:html={highlight(hero.headline, "highlight")}
+        />
+        {hero.description && (
+          <p class="page-hero-description">{hero.description}</p>
+        )}
+      </div>
+    </section>
+  )
+}

@@ -1,0 +1,85 @@
+---
+// Desktop pointer only: nothing runs on touch screens or with reduced motion.
+---
+
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<script>
+  const dot = document.querySelector<HTMLElement>(".cursor-dot");
+  const ring = document.querySelector<HTMLElement>(".cursor-ring");
+  const desktop = window.matchMedia(
+    "(hover: hover) and (pointer: fine) and (min-width: 1025px)"
+  );
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  if (dot && ring && desktop.matches && !reduced.matches) {
+    const root = document.documentElement;
+    const INTERACTIVE =
+      "a, button, .feature-card, .portfolio-item, .testimonial-card, .news-card, .tech-card";
+    let mx = 0,
+      my = 0,
+      rx = 0,
+      ry = 0,
+      frame = 0,
+      started = false;
+
+    // The ring eases toward the pointer and stops animating once it catches up
+    const tick = () => {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = `${rx}px`;
+      ring.style.top = `${ry}px`;
+      frame =
+        Math.abs(mx - rx) > 0.1 || Math.abs(my - ry) > 0.1
+          ? requestAnimationFrame(tick)
+          : 0;
+    };
+
+    // Areas marked data-native-cursor (and any iframe, such as the Cal.com calendar) keep the normal
+    // cursor. Iframes swallow mouse events, so the dot and ring would freeze at their edge.
+    // Cal.com hides its iframe inside a <cal-inline> shadow root, so the page sees that element instead.
+    const NATIVE = "iframe, cal-inline, [data-native-cursor]";
+    let nativeZone = false;
+
+    document.addEventListener(
+      "mousemove",
+      (e) => {
+        if (nativeZone) return;
+        mx = e.clientX;
+        my = e.clientY;
+        dot.style.left = `${mx}px`;
+        dot.style.top = `${my}px`;
+        if (!started) {
+          rx = mx;
+          ry = my;
+          started = true;
+        }
+        root.classList.add("cursor-active");
+        if (!frame) frame = requestAnimationFrame(tick);
+      },
+      { passive: true }
+    );
+
+    // Delegated, so links added later still expand the ring
+    document.addEventListener("mouseover", (e) => {
+      const target = e.target as Element;
+
+      nativeZone = Boolean(target.closest(NATIVE));
+      if (nativeZone) {
+        root.classList.remove("cursor-active");
+        started = false; // the ring snaps back to the pointer when it returns
+        return;
+      }
+
+      ring.classList.toggle(
+        "is-expanded",
+        Boolean(target.closest(INTERACTIVE))
+      );
+    });
+
+    root.addEventListener("mouseleave", () =>
+      root.classList.remove("cursor-active")
+    );
+  }
+</script>

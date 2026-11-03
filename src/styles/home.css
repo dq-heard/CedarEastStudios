@@ -1,0 +1,671 @@
+/* Home page: hero, ticker, services intro, work + testimonials + news sections.
+   The shared cards live in cards.css. */
+
+/* ==================== HERO ==================== */
+.hero-section {
+  min-height: 90vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--charcoal);
+  overflow: hidden;
+}
+
+/* --hero-bg is set inline from the Studio image; the file in /public is the fallback */
+.hero-parallax-bg {
+  position: absolute;
+  inset: -20% 0;
+  will-change: transform;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 14, 0.93) 0%,
+    rgba(28, 28, 34, 0.78) 55%,
+    color-mix(in srgb, var(--color-primary) 12%, transparent) 100%
+  );
+}
+
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding-top: 120px;
+  padding-bottom: 100px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  padding: 8px 18px;
+  border-radius: 100px;
+  margin-bottom: 28px;
+}
+
+.hero-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: pulseDot 2s ease infinite;
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.4);
+  }
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 7vw, 5.8rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+}
+
+.hero-title .highlight {
+  color: var(--color-primary);
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.62);
+  max-width: 520px;
+  line-height: 1.82;
+  margin-bottom: 40px;
+}
+
+.hero-btns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 2px solid var(--color-primary);
+  transition: var(--transition-smooth);
+}
+
+.btn-hero-primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 20px 60px
+    color-mix(in srgb, var(--color-primary) 50%, transparent);
+}
+
+.btn-hero-primary:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  text-align: center;
+}
+
+.scroll-mouse {
+  width: 26px;
+  height: 42px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 13px;
+  margin: 0 auto 8px;
+  position: relative;
+}
+
+.scroll-mouse::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 2px;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollMouseAnim 1.8s ease infinite;
+}
+
+@keyframes scrollMouseAnim {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(14px);
+  }
+}
+
+.scroll-text {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 575px) {
+  .hero-btns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-hero-primary {
+    justify-content: center;
+  }
+}
+
+/* ==================== TICKER ==================== */
+.ticker-banner {
+  padding: 22px 0;
+  background: var(--surface-sunken);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+  user-select: none;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: tickerLoop 30s linear infinite;
+}
+
+.ticker-banner:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.ticker-content {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  padding-right: 50px; /* must match the gap so the clone spacing is identical */
+  flex-shrink: 0;
+}
+
+.ticker-item {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+  cursor: default;
+}
+
+.ticker-item:hover {
+  color: var(--color-primary);
+}
+
+.ticker-dot {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+@keyframes tickerLoop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* WCAG 2.2.2: no motion for people who ask for none. Show one wrapped list, drop the clone. */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    width: auto;
+    justify-content: center;
+  }
+  .ticker-content {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 40px;
+    padding: 0 16px;
+  }
+  .ticker-content[aria-hidden="true"] {
+    display: none;
+  }
+  .hero-dot,
+  .scroll-mouse::after {
+    animation: none;
+  }
+}
+
+/* ==================== SERVICES INTRO ==================== */
+.features-section {
+  padding: 80px 0;
+  background: var(--surface-raised);
+}
+
+.feature-card {
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  border: 1px solid var(--border-color);
+  transition: var(--transition-smooth);
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-elevated);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.feature-icon-wrap {
+  width: 58px;
+  height: 58px;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: var(--color-primary);
+  margin-bottom: 20px;
+  transition: var(--transition-smooth);
+}
+
+.feature-card:hover .feature-icon-wrap {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.feature-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.feature-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* Centered header: the description is capped at 580px, so center it too */
+.features-section .section-description {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ==================== WORK ==================== */
+.portfolio-section {
+  padding: 100px 0 120px;
+  background: var(--surface-base);
+}
+
+/* ==================== TESTIMONIALS ==================== */
+.testimonials-section {
+  padding: 120px 0;
+  background: #110e0c; /* fixed deep dark background, same in both themes */
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+.testimonials-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.testimonials-section .section-title {
+  color: #ffffff;
+}
+
+.testimonials-section .section-title span {
+  color: var(--burnt-orange, #c4622d);
+}
+
+.testimonials-section .section-description {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.testimonial-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px 36px;
+  position: relative;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.testimonial-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px);
+}
+
+.testimonial-rating {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.testimonial-rating i {
+  color: #ffb800;
+  font-size: 0.9rem;
+}
+
+.testimonial-quote-mark {
+  position: absolute;
+  top: 12px;
+  right: 24px;
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.15);
+  font-family: var(--font-heading), Georgia, serif;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.testimonial-quote {
+  font-family: var(--font-body);
+  font-size: 1.02rem;
+  color: #f3ebdc;
+  line-height: 1.75;
+  font-style: italic;
+  margin-bottom: 28px;
+  flex-grow: 1;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--burnt-orange, #c4622d);
+  flex-shrink: 0;
+}
+
+.testimonial-name {
+  display: block;
+  font-family: var(--font-heading);
+  font-style: normal;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.testimonial-company {
+  display: block;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Scroll-snap row (replaces Swiper) */
+.testimonial-scroller {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+}
+
+.testimonial-scroller:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.testimonial-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 88%;
+  gap: 24px;
+  margin: 0;
+  padding: 0 0 8px;
+}
+
+.testimonial-slide {
+  scroll-snap-align: start;
+  display: flex;
+}
+
+.testimonial-slide .testimonial-card {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .testimonial-track {
+    grid-auto-columns: calc((100% - 24px) / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonial-track {
+    grid-auto-columns: calc((100% - 48px) / 3);
+  }
+}
+
+/* ==================== NEWS TEASER ==================== */
+.news-section {
+  padding: 120px 0;
+  background: var(--surface-base);
+}
+
+.btn-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary-link:hover,
+.btn-secondary-link:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+}
+
+/* ==================== HOW IT WORKS (process timeline) ==================== */
+/* Vertical by default; horizontal from 992px up when there are 5 steps or fewer. */
+.process-section {
+  padding: 110px 0;
+  background: var(--surface-sunken);
+}
+
+.process-timeline {
+  list-style: none;
+  counter-reset: step;
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.process-step {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 44px 84px;
+}
+
+.process-step:last-child {
+  padding-bottom: 0;
+}
+
+/* Numbered marker */
+.process-step::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.2rem;
+  box-shadow: 0 8px 24px
+    color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+/* Connector line to the next step */
+.process-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 27px;
+  top: 64px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(var(--color-primary), var(--border-color));
+}
+
+.process-duration {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+}
+
+.process-step-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.process-step-description {
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 560px;
+}
+
+@media (max-width: 575px) {
+  .process-step {
+    padding-left: 72px;
+  }
+  .process-step::before {
+    width: 48px;
+    height: 48px;
+    font-size: 1.05rem;
+  }
+  .process-step:not(:last-child)::after {
+    left: 23px;
+    top: 56px;
+  }
+}
+
+/* ==================== HORIZONTAL (desktop) ==================== */
+/* Every step is centered on its column, so the row has equal space on both sides */
+@media (min-width: 992px) {
+  .process-timeline--horizontal {
+    display: grid;
+    grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+    column-gap: 32px;
+    max-width: none;
+  }
+
+  .process-timeline--horizontal .process-step {
+    padding: 80px 0 0;
+    text-align: center;
+  }
+
+  /* Marker centered on the column */
+  .process-timeline--horizontal .process-step::before {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Connector runs from just right of this marker to just left of the next one.
+     Marker is 56px wide: 28px to its edge + 8px gap = 36px. The next marker's left
+     edge is 1.5 columns + 32px - 28px away, so stop 8px short of it. */
+  .process-timeline--horizontal .process-step:not(:last-child)::after {
+    left: calc(50% + 36px);
+    right: calc(-50% + 4px);
+    top: 27px;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--color-primary),
+      var(--border-color)
+    );
+  }
+
+  .process-timeline--horizontal .process-step-description {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
