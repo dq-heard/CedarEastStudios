@@ -279,16 +279,31 @@ section {
   box-shadow: 0 10px 30px rgba(243, 235, 220, 0.12);
 }
 
-/* Outline Button */
-.btn-outline {
-  background: transparent;
-  color: var(--text-main);
-  border: 2px solid var(--border-color);
+/* Secondary: glass outline */
+.btn-secondary {
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.btn-outline:hover,
-.btn-outline:focus-visible {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  color: #ffffff;
   transform: translateY(-2px);
+  outline: none;
+}
+
+@media (max-width: 991.98px) {
+  .row.g-5 {
+    --bs-gutter-x: 1.5rem;
+  }
 }

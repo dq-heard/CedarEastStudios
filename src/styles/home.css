@@ -189,10 +189,6 @@
 @media (max-width: 575px) {
   .hero-btns {
     flex-direction: column;
-    align-items: stretch;
-  }
-  .btn-hero-primary {
-    justify-content: center;
   }
 }
 
