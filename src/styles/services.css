@@ -337,6 +337,10 @@ body:has(.service-modal[open]) {
   color: var(--color-primary);
 }
 
+.featured .pricing-tier {
+  color: var(--cedar);
+}
+
 .pricing-prefix {
   display: block;
   margin-bottom: 2px;
@@ -376,6 +380,10 @@ body:has(.service-modal[open]) {
   height: 1px;
   margin-bottom: 24px;
   background: var(--border-color);
+}
+
+.pricing-card.featured .pricing-divider {
+  background: var(--color-primary);
 }
 
 .pricing-features {
@@ -422,13 +430,16 @@ body:has(.service-modal[open]) {
   outline-offset: 2px;
 }
 .pricing-card.featured .btn-pricing {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--cedar);
+  border-color: var(--cedar);
   color: #fff;
 }
 .pricing-card.featured .btn-pricing:hover {
-  background: color-mix(in srgb, var(--color-primary) 88%, black);
-  border-color: color-mix(in srgb, var(--color-primary) 88%, black);
+  background: color-mix(in srgb, var(--cedar) 88%, black);
+  border-color: color-mix(in srgb, var(--cedar) 88%, black);
+}
+.pricing-card.featured .btn-pricing:focus-visible {
+  outline: 3px solid var(--cedar);
 }
 
 /* Retainer banner */
@@ -444,7 +455,7 @@ body:has(.service-modal[open]) {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--cedar);
 }
 .retainer-title {
   margin-bottom: 8px;
@@ -476,19 +487,19 @@ body:has(.service-modal[open]) {
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--color-primary);
-  border: 1.5px solid var(--color-primary);
+  color: var(--cedar);
+  border: 1.5px solid var(--cedar);
   border-radius: 100px;
   transition: var(--transition-fast);
 }
 .btn-retainer:hover,
 .btn-retainer:focus-visible {
-  background: var(--color-primary);
+  background: var(--cedar);
   color: #fff;
   outline: none;
 }
 .btn-retainer:focus-visible {
-  outline: 3px solid var(--color-primary);
+  outline: 3px solid var(--cedar);
   outline-offset: 2px;
 }
 
@@ -628,7 +639,7 @@ body:has(.service-modal[open]) {
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
-  color: var(--color-primary);
+  color: var(--cedar);
   transition: gap var(--transition-fast);
 }
 .btn-primary-link:hover,
@@ -636,7 +647,7 @@ body:has(.service-modal[open]) {
   gap: 14px;
 }
 .btn-primary-link:focus-visible {
-  outline: 3px solid var(--color-primary);
+  outline: 3px solid var(--cedar);
   outline-offset: 4px;
   border-radius: var(--radius-sm);
 }

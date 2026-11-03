@@ -103,7 +103,7 @@
 }
 
 .quote-text .highlight {
-  color: var(--color-primary);
+  color: var(--copper);
   font-style: italic;
 }
 

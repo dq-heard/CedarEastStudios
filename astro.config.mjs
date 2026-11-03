@@ -21,7 +21,7 @@ if (!PUBLIC_SANITY_PROJECT_ID) {
 }
 
 export default defineConfig({
-  site: "https://cedareaststudios.com",
+  site: "https://www.cedareaststudios.com",
   trailingSlash: "never",
   adapter: cloudflare(),
   integrations: [

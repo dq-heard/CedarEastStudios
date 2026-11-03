@@ -23,7 +23,8 @@
   /* --- Typography --- */
   --text-main: #2b2724; /* Charcoal body text (~13:1 contrast) */
   --text-muted: #5a5149; /* Secondary body / captions */
-  --text-subtle: #6f665c; /* Low-emphasis text (~5:1 contrast) */
+  --text-subtle: #62594f; /* ~4.9:1 on sunken, ~6:1 on cream */
+  --on-primary: #fff; /* text on rust buttons */
 
   /* --- UI Functional Aliases --- */
   --color-primary: var(--rust);
@@ -68,7 +69,8 @@
   /* --- Typography --- */
   --text-main: #f3ebdc; /* Inverted cream text */
   --text-muted: #b8ad9d; /* (~8:1 contrast) */
-  --text-subtle: #8a8073; /* (~4.6:1 contrast) */
+  --text-subtle: #a39a8c; /* ~5.3:1 on sunken, ~6.4:1 on base */
+  --on-primary: #1a1714; /* dark text on the lightened rust (~5:1) */
 
   /* --- UI Functional Aliases --- */
   --color-primary: var(--rust);
@@ -221,20 +223,20 @@ section {
 
 /* Primary Button (Rust) */
 .btn-primary {
-  --bs-btn-color: #fff;
+  --bs-btn-color: var(--on-primary);
   --bs-btn-bg: var(--color-primary);
   --bs-btn-border-color: var(--color-primary);
-  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-color: var(--on-primary);
   --bs-btn-hover-bg: var(--color-primary-hover);
   --bs-btn-hover-border-color: var(--color-primary-hover);
-  --bs-btn-active-color: #fff;
+  --bs-btn-active-color: var(--on-primary);
   --bs-btn-active-bg: var(--color-primary-hover);
   --bs-btn-active-border-color: var(--color-primary-hover);
   --bs-btn-active-shadow: none;
   --bs-btn-focus-shadow-rgb: 0, 0, 0;
 
   background: var(--color-primary);
-  color: #fff;
+  color: var(--on-primary);
   border: 2px solid var(--color-primary);
 }
 
@@ -242,10 +244,39 @@ section {
 .btn-primary:focus-visible {
   background: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  color: #fff;
+  color: var(--on-primary);
   transform: translateY(-3px);
   box-shadow: 0 14px 40px
     color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+/* Dark mode: white buttons on dark surfaces (primary, hero, prefooter) */
+[data-theme="dark"] .btn-primary {
+  --bs-btn-bg: #fff;
+  --bs-btn-border-color: #fff;
+  --bs-btn-color: #8c3b2a;
+  --bs-btn-hover-bg: var(--text-main);
+  --bs-btn-hover-border-color: var(--text-main);
+  --bs-btn-hover-color: #8c3b2a;
+  --bs-btn-active-bg: var(--text-main);
+  --bs-btn-active-border-color: var(--text-main);
+  --bs-btn-active-color: #8c3b2a;
+  --bs-btn-active-shadow: none;
+
+  background: #fff;
+  border: 2px solid #fff;
+  color: #8c3b2a;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .btn.btn-primary:hover,
+[data-theme="dark"] .btn.btn-primary:focus-visible,
+[data-theme="dark"] .btn.btn-primary:active {
+  background: var(--text-main);
+  border-color: var(--text-main);
+  color: #8c3b2a;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(243, 235, 220, 0.12);
 }
 
 /* Outline Button */
@@ -259,32 +290,5 @@ section {
 .btn-outline:focus-visible {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  transform: translateY(-2px);
-}
-
-/* White / High-Contrast Button */
-.btn-light {
-  --bs-btn-color: var(--color-primary);
-  --bs-btn-bg: #fff;
-  --bs-btn-border-color: #fff;
-  --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: var(--charcoal);
-  --bs-btn-hover-border-color: var(--charcoal);
-  --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: var(--charcoal);
-  --bs-btn-active-border-color: var(--charcoal);
-  --bs-btn-active-shadow: none;
-
-  background: #fff;
-  color: var(--color-primary);
-  border: 2px solid #fff;
-  font-weight: 700;
-}
-
-.btn-light:hover,
-.btn-light:focus-visible {
-  background: var(--charcoal);
-  border-color: var(--charcoal);
-  color: #fff;
   transform: translateY(-2px);
 }

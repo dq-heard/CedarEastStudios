@@ -172,7 +172,7 @@ textarea.form-control {
 }
 
 .btn-submit-primary {
-  width: 100%;
+  width: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -181,8 +181,8 @@ textarea.form-control {
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  background: var(--color-primary);
-  border: 1px solid var(--color-primary);
+  background: var(--cedar);
+  border: 1px solid var(--cedar);
   border-radius: 100px;
   cursor: pointer;
   transition:
@@ -191,12 +191,12 @@ textarea.form-control {
 }
 .btn-submit-primary:hover,
 .btn-submit-primary:focus-visible {
-  background: color-mix(in srgb, var(--color-primary) 88%, black);
-  border-color: color-mix(in srgb, var(--color-primary) 88%, black);
+  background: color-mix(in srgb, var(--cedar) 88%, black);
+  border-color: color-mix(in srgb, var(--cedar) 88%, black);
   box-shadow: var(--shadow-md);
 }
 .btn-submit-primary:focus-visible {
-  outline: 3px solid var(--color-primary);
+  outline: 3px solid var(--cedar);
   outline-offset: 3px;
 }
 .btn-submit-primary:disabled {
@@ -298,7 +298,7 @@ textarea.form-control {
   color: var(--text-muted);
 }
 .cal-fallback a {
-  color: var(--color-primary);
+  color: var(--cedar);
   text-underline-offset: 3px;
 }
 
@@ -310,6 +310,10 @@ textarea.form-control {
 }
 
 @media (max-width: 575px) {
+  .btn-submit-primary {
+    width: 100%;
+  }
+
   .contact-socials {
     justify-content: center;
   }

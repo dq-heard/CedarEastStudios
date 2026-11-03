@@ -131,7 +131,7 @@ const testimonials = (data.testimonials?.items ?? [])
         class="hero-section"
         style={heroBg ? `--hero-bg: url("${heroBg}")` : undefined}
       >
-        <div class="hero-parallax-bg" aria-hidden="true" />
+        <div class="hero-bg" aria-hidden="true" />
         <div class="hero-overlay" aria-hidden="true" />
         <div class="hero-grain" aria-hidden="true" />
         <div class="container hero-content">
@@ -155,7 +155,7 @@ const testimonials = (data.testimonials?.items ?? [])
               )}
               <div class="hero-btns">
                 {hero.ctaText && hero.ctaHref && (
-                  <a href={hero.ctaHref} class="btn btn-hero-primary">
+                  <a href={hero.ctaHref} class="btn btn-primary">
                     {hero.ctaText}
                     <i class="fas fa-arrow-right" aria-hidden="true" />
                   </a>

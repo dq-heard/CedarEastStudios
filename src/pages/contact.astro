@@ -18,7 +18,7 @@ const HEADER = `header{ badge, title, description }`;
 const QUERY = `{
   "hero": *[_type == "pageHero" && page == "contact"][0]{ badge, headline, description, ${SEO} },
   "contact": *[_type == "contact"][0]{
-    ${HEADER}, formTitle, bookingTitle, bookingDescription, packageOptions,
+    ${HEADER}, formTitle, bookingBadge, bookingTitle, bookingDescription, packageOptions,
     nextStepsTitle, nextSteps[]{ _key, title, text }
   },
   "pricing": *[_type == "pricing"][0] ${PRICING_REFS_PROJECTION}
@@ -27,7 +27,7 @@ const QUERY = `{
 interface ContactPageData {
   hero?: { badge?: string; headline?: string; description?: string; seo?: Seo | null } | null;
   contact?: {
-    header?: Header; formTitle?: string; bookingTitle?: string; bookingDescription?: string;
+    header?: Header; formTitle?: string; bookingBadge?: string; bookingTitle?: string; bookingDescription?: string;
     packageOptions?: string[];
     nextStepsTitle?: string; nextSteps?: { _key: string; title?: string; text?: string }[];
   } | null;
@@ -67,7 +67,7 @@ const hasSidebar = Boolean(
       <div class="container">
         <div class="booking-header text-center mx-auto">
           <SectionHeader
-            header={{ title: contact?.bookingTitle, description: contact?.bookingDescription }}
+            header={{ badge: contact?.bookingBadge, title: contact?.bookingTitle, description: contact?.bookingDescription }}
             id="booking-title"
             class="text-center"
           />

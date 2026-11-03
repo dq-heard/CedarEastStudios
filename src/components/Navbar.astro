@@ -60,7 +60,7 @@ const cta = nav.cta?.label && nav.cta?.href ? nav.cta : null;
         {
           cta && (
             <li class="nav-item d-lg-none">
-              <a class="nav-link nav-cta" href={cta.href}>
+              <a class="nav-link btn-primary" href={cta.href}>
                 {cta.label}
                 <i class="fas fa-arrow-right ms-2" aria-hidden="true" />
               </a>
@@ -74,7 +74,7 @@ const cta = nav.cta?.label && nav.cta?.href ? nav.cta : null;
       cta && (
         <a
           href={cta.href}
-          class="nav-link nav-cta ms-3 d-none d-lg-inline-flex"
+          class="nav-link btn-primary ms-3 d-none d-lg-inline-flex"
         >
           {cta.label}
           <i class="fas fa-arrow-right ms-2 mt-1" aria-hidden="true" />

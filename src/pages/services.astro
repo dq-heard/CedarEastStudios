@@ -191,7 +191,7 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                       </div>
                     )}
                     {tier.description && <p class="pricing-description">{tier.description}</p>}
-                    <div class="pricing-divider"></div>
+                    <div class="pricing-divider" aria-hidden="true"></div>
                     {features.length > 0 && (
                       <ul class="pricing-features list-unstyled">
                         {features.map((feature) => (

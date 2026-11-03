@@ -3,4 +3,4 @@ Allow: /
 Disallow: /studio
 Disallow: /api/
 
-Sitemap: https://cedareaststudios.com/sitemap-index.xml
+Sitemap: https://www.cedareaststudios.com/sitemap-index.xml

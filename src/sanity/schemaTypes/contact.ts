@@ -15,6 +15,12 @@ export const contact = defineType({
   fields: [
     // ---- 1. Calendar (the top section) ----
     defineField({
+      name: "bookingBadge",
+      title: "Calendar Eyebrow",
+      type: "string",
+      group: "calendar",
+    }),
+    defineField({
       name: "bookingTitle",
       title: "Calendar Heading",
       type: "string",
