@@ -1,0 +1,50 @@
+---
+interface Props {
+  class?: string;
+  width?: string;
+  height?: string;
+}
+
+const { class: className = "", width = "160", height = "40" } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 50"
+  width={width}
+  height={height}
+  class={`brand-logo ${className}`}
+  aria-label="CedarEast Studios Logo"
+>
+  <!-- Optional Geometric Mark / Monogram -->
+  <g class="brand-mark" transform="translate(0, 5)">
+    <rect width="40" height="40" rx="8" fill="currentColor" opacity="0.1"
+    ></rect>
+    <path
+      d="M12 15h16M12 20h12M12 25h16"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"></path>
+  </g>
+
+  <!-- Typography / Wordmark (Converted paths or system font fallback) -->
+  <text
+    x="52"
+    y="32"
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    font-weight="700"
+    font-size="22"
+    fill="currentColor"
+    letter-spacing="-0.5px"
+  >
+    CedarEast
+  </text>
+</svg>
+
+<style>
+  .brand-logo {
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--brand-color, #8c3b2a); /* Easily style via CSS variables */
+  }
+</style>
