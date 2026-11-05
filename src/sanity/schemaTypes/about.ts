@@ -40,6 +40,13 @@ export const philosophy = defineType({
     }),
     defineField({ name: "authorName", title: "Author", type: "string" }),
     defineField({ name: "authorRole", title: "Author Role", type: "string" }),
+    defineField({
+      name: "backgroundImage",
+      title: "Background Image (optional)",
+      type: "image",
+      options: { hotspot: true },
+      description: "Shown very faintly behind the quote.",
+    }),
   ],
 });
 

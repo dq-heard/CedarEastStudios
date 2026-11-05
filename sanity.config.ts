@@ -5,7 +5,7 @@ import { schemaTypes } from "./src/sanity/schemaTypes"; // Pointing to your sche
 
 export default defineConfig({
   name: "default",
-  title: "CedarEast Studios",
+  title: "Cedar East Studios",
 
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
   dataset: import.meta.env.PUBLIC_SANITY_DATASET,

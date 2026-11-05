@@ -167,9 +167,9 @@ section {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--cedar);
   padding: 6px 14px;
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  background: color-mix(in srgb, var(--cedar) 10%, transparent);
   border-radius: 100px;
   margin-bottom: 16px;
 }
@@ -178,7 +178,7 @@ section {
   content: "";
   width: 6px;
   height: 6px;
-  background: var(--color-primary);
+  background: var(--cedar);
   border-radius: 50%;
 }
 

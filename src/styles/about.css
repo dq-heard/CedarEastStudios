@@ -50,7 +50,8 @@
 .quote-background {
   position: absolute;
   inset: 0;
-  opacity: 0.08;
+  background: var(--quote-bg, none) center/cover no-repeat;
+  opacity: 0.12;
   pointer-events: none;
 }
 

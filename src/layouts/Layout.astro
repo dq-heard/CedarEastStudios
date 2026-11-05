@@ -30,7 +30,7 @@ const {
 const site = await getSite();
 const { settings } = site;
 
-// "About" -> "About | CedarEast Studios". Titles that already name the agency are left alone.
+// "About" -> "About | Cedar East Studios". Titles that already name the agency are left alone.
 const withAgency = (t: string) =>
   settings.agencyName && !t.includes(settings.agencyName)
     ? `${t} | ${settings.agencyName}`
@@ -59,7 +59,6 @@ const jsonLd = settings.agencyName
       url: Astro.site?.href,
       description: settings.seoDescription,
       email: settings.supportEmail,
-      telephone: settings.phoneNumber,
       address: settings.address,
       image: ogImage,
       sameAs: settings.socials?.map((s) => s.url),

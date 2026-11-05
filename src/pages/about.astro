@@ -18,7 +18,7 @@ const QUERY = `{
     ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal),
     image
   },
-  "philosophy": *[_type == "philosophy"][0]{ quote, authorName, authorRole },
+  "philosophy": *[_type == "philosophy"][0]{ quote, authorName, authorRole, backgroundImage },
   "tech": *[_type == "techStack"][0]{ ${HEADER}, items[]{ _key, name, iconName, note } },
   "founder": *[_type == "founder"][0]{
     ${HEADER}, portrait, isAvailable, availableText, unavailableText,
@@ -33,7 +33,6 @@ interface AboutPageData {
     badge?: string;
     headline?: string;
     description?: string;
-    backgroundImage?: any;
     seo?: Seo | null;
   } | null;
   about?: {
@@ -48,6 +47,7 @@ interface AboutPageData {
     quote?: string;
     authorName?: string;
     authorRole?: string;
+    backgroundImage?: any;
   } | null;
   tech?: {
     header?: Header;
@@ -97,6 +97,9 @@ const portrait = founder?.portrait?.asset
         .url(),
       alt: founder.portrait.alt ?? "",
     }
+  : null;
+const quoteBg = philosophy?.backgroundImage?.asset
+  ? urlFor(philosophy.backgroundImage).width(2000).auto("format").url()
   : null;
 const available = founder?.isAvailable !== false;
 const availabilityText = available
@@ -159,7 +162,11 @@ const socials = mapSocials(founder?.socialLinks);
         class="quote-section"
         aria-label="Agency Philosophy"
       >
-        <div class="quote-background" aria-hidden="true" />
+        <div
+          class="quote-background"
+          style={quoteBg ? `--quote-bg: url("${quoteBg}")` : undefined}
+          aria-hidden="true"
+        />
         <div class="container quote-container">
           <figure class="quote-wrapper text-center mx-auto">
             <div class="quote-mark" aria-hidden="true">

@@ -42,6 +42,7 @@ const QUERY = `{
     | order(publishedAt desc, year desc, _createdAt desc)[0...5] ${CASE_CARD_PROJECTION},
   "testimonials": *[_type == "testimonials"][0]{
     ${HEADER},
+    backgroundImage,
     items[]{ _key, quote, rating, authorName, authorRole, avatar }
   },
   "newsHeader": *[_type == "news"][0]{ ${HEADER}, ctaText },
@@ -80,6 +81,7 @@ interface HomeData {
   projects?: RawCaseCard[];
   testimonials?: {
     header?: Header;
+    backgroundImage?: any;
     items?: {
       _key: string;
       quote?: string;
@@ -108,6 +110,10 @@ const posts = (data.posts ?? []).map(mapPostCard);
 // The hero background comes from Studio when set
 const heroBg = hero?.backgroundImage
   ? urlFor(hero.backgroundImage).width(2400).auto("format").url()
+  : null;
+
+const testimonialsBg = data.testimonials?.backgroundImage?.asset
+  ? urlFor(data.testimonials.backgroundImage).width(2000).auto("format").url()
   : null;
 
 const testimonials = (data.testimonials?.items ?? [])
@@ -323,7 +329,15 @@ const testimonials = (data.testimonials?.items ?? [])
         class="testimonials-section"
         aria-labelledby="testimonials-title"
       >
-        <div class="testimonials-bg" aria-hidden="true" />
+        <div
+          class="testimonials-bg"
+          style={
+            testimonialsBg
+              ? `--testimonials-bg: url("${testimonialsBg}")`
+              : undefined
+          }
+          aria-hidden="true"
+        />
         <div class="container position-relative z-1">
           <div class="row section-header align-items-end mb-5">
             <div class="col-lg-6">

@@ -110,6 +110,13 @@ export const testimonials = defineType({
   fields: [
     defineField({ name: "header", title: "Header", type: "sectionHeader" }),
     defineField({
+      name: "backgroundImage",
+      title: "Background Image (optional)",
+      type: "image",
+      options: { hotspot: true },
+      description: "Shown very faintly behind the testimonials.",
+    }),
+    defineField({
       name: "items",
       title: "Testimonials",
       type: "array",

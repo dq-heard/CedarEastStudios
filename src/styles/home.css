@@ -351,6 +351,7 @@
 .testimonials-bg {
   position: absolute;
   inset: 0;
+  background: var(--testimonials-bg, none) center/cover no-repeat;
   opacity: 0.08;
   pointer-events: none;
 }
