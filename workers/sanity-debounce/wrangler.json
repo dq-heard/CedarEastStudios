@@ -1,0 +1,9 @@
+{
+  "name": "sanity-debounce",
+  "main": "src/index.js",
+  "compatibility_date": "2025-01-01",
+  "triggers": { "crons": ["* * * * *"] },
+  "kv_namespaces": [
+    { "binding": "DEBOUNCE", "id": "8c04e23014444c7eb861d5b7eab0f6d8" }
+  ]
+}

@@ -2,4 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cedareaststudios",
   "compatibility_date": "2026-10-30",
+  "kv_namespaces": [
+    { "binding": "SESSION", "id": "04b18957ef05415eb83f7a119ec82570" },
+  ],
 }
