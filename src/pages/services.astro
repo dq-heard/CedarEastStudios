@@ -10,25 +10,35 @@ import type { Header } from "../sanity/types";
 import { SEO, resolveSeo, type Seo } from "../sanity/seo";
 import "../styles/services.css";
 
-const HEADER = `header{ badge, title, description }`;
-const HREF = (field: string) => `"ctaHref": coalesce(${field}.external, ${field}.internal)`;
+const HDR = (field: string) =>
+  `"header": ${field}{ badge, title, description }`;
+const HREF = (field: string) =>
+  `"ctaHref": coalesce(${field}.external, ${field}.internal)`;
+const PAGE = `*[_type == "servicesPage"][0]`;
 
 const QUERY = `{
-  "hero": *[_type == "pageHero" && page == "services"][0]{ badge, headline, description, ${SEO} },
-  "intro": *[_type == "servicesSection"][0]{ ${HEADER} },
+  "hero": ${PAGE}{
+    "badge": heroBadge, "headline": heroHeadline, "description": heroDescription,
+    ${SEO}
+  },
+  "intro": ${PAGE}{ ${HDR("servicesHeader")} },
   "services": *[_type == "service"] | order(coalesce(order, 9999) asc, _createdAt asc){
     _id, title, iconName, tags, shortDescription, description,
     subServices[]{ _key, title, description }
   },
-  "pricing": *[_type == "pricing"][0]{
-    ${HEADER},
+  "pricing": ${PAGE}{
+    ${HDR("pricingHeader")},
     tiers[]{
       _key, tierName, "key": key.current, isPopular, popularBadgeText, pricePrefix, price, description, features,
       ctaText, ${HREF("ctaLink")}
     },
     retainer{ badge, title, description, price, interval, ctaText, ${HREF("ctaLink")} }
   },
-  "faq": *[_type == "faq"][0]{ ${HEADER}, ctaText, items[]{ _key, question, answer } }
+  "faq": ${PAGE}{
+    ${HDR("faqHeader")},
+    "ctaText": faqCtaText,
+    "items": faqItems[]{ _key, question, answer }
+  }
 }`;
 
 interface ServicesPageData {

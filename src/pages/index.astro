@@ -20,32 +20,40 @@ import { SEO, resolveSeo, type Seo } from "../sanity/seo";
 import { highlight } from "../utils/highlight";
 import "../styles/home.css";
 
-const HEADER = `header{ badge, title, description }`;
+const HEADER = (field: string) =>
+  `"header": ${field}{ badge, title, description }`;
+const HOME = `*[_type == "homePage"][0]`;
 
 const QUERY = `{
-  "hero": *[_type == "hero"][0]{
+  "hero": ${HOME}{
     tag, headline, description,
     ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal),
     backgroundImage,
+    "videoMp4": videoMp4.asset->url,
+    "videoWebm": videoWebm.asset->url,
+    videoOnMobile, videoCredit,
     ${SEO}
   },
-  "trades": *[_type == "siteSettings"][0].tradesServed,
-  "process": *[_type == "process"][0]{ ${HEADER}, steps[]{ _key, title, duration, description } },
-  "intro": *[_type == "servicesIntro"][0]{
-    ${HEADER}, ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal)
+  "tickerItems": *[_type == "siteSettings"][0].tickerItems,
+  "process": ${HOME}{
+    ${HEADER("processHeader")},
+    "steps": processSteps[]{ _key, title, duration, description }
   },
-  "services": *[_type == "service"] | order(coalesce(order, 9999) asc, _createdAt asc)[0...4]{
-    _id, title, shortDescription, iconName
+  "intro": ${HOME}{
+    ${HEADER("introHeader")},
+    "cards": introCards[]{ _key, title, text, iconName },
+    "ctaText": introCtaText,
+    "ctaHref": coalesce(introCtaLink.external, introCtaLink.internal)
   },
-  "work": *[_type == "portfolio"][0]{ ${HEADER}, ctaText },
+  "work": ${HOME}{ ${HEADER("workHeader")}, "ctaText": workCtaText },
   "projects": *[_type == "caseStudy" && featured == true && defined(slug.current)]
     | order(publishedAt desc, year desc, _createdAt desc)[0...5] ${CASE_CARD_PROJECTION},
-  "testimonials": *[_type == "testimonials"][0]{
-    ${HEADER},
-    backgroundImage,
-    items[]{ _key, quote, rating, authorName, authorRole, avatar }
+  "testimonials": ${HOME}{
+    ${HEADER("testimonialsHeader")},
+    "backgroundImage": testimonialsImage,
+    "items": testimonials[]{ _key, quote, rating, authorName, authorRole, avatar }
   },
-  "newsHeader": *[_type == "news"][0]{ ${HEADER}, ctaText },
+  "newsHeader": ${HOME}{ ${HEADER("newsHeader")}, "ctaText": newsCtaText },
   "posts": *[_type == "post" && defined(slug.current)]
     | order(publishedAt desc)[0...3] ${POST_CARD_PROJECTION}
 }`;
@@ -58,9 +66,13 @@ interface HomeData {
     ctaText?: string;
     ctaHref?: string;
     backgroundImage?: any;
+    videoMp4?: string | null;
+    videoWebm?: string | null;
+    videoOnMobile?: boolean;
+    videoCredit?: string;
     seo?: Seo | null;
   } | null;
-  trades?: string[] | null;
+  tickerItems?: string[] | null;
   process?: {
     header?: Header;
     steps?: {
@@ -70,13 +82,17 @@ interface HomeData {
       description?: string;
     }[];
   } | null;
-  intro?: { header?: Header; ctaText?: string; ctaHref?: string } | null;
-  services?: {
-    _id: string;
-    title: string;
-    shortDescription?: string;
-    iconName?: string;
-  }[];
+  intro?: {
+    header?: Header;
+    ctaText?: string;
+    ctaHref?: string;
+    cards?: {
+      _key: string;
+      title?: string;
+      text?: string;
+      iconName?: string;
+    }[];
+  } | null;
   work?: { header?: Header; ctaText?: string } | null;
   projects?: RawCaseCard[];
   testimonials?: {
@@ -98,12 +114,12 @@ interface HomeData {
 const data = await client.fetch<HomeData>(QUERY);
 
 const { hero, intro, work, newsHeader } = data;
-const trades = (data.trades ?? []).filter(Boolean);
+const tickerItems = (data.tickerItems ?? []).filter(Boolean);
 
 // "How it works": horizontal on desktop for 2-5 steps, a vertical list otherwise
 const processSteps = (data.process?.steps ?? []).filter((step) => step.title);
 const processHorizontal = processSteps.length > 1 && processSteps.length <= 5;
-const services = data.services ?? [];
+const cards = (intro?.cards ?? []).filter((c) => c.title);
 const projects = (data.projects ?? []).map(mapCaseCard);
 const posts = (data.posts ?? []).map(mapPostCard);
 
@@ -138,6 +154,23 @@ const testimonials = (data.testimonials?.items ?? [])
         style={heroBg ? `--hero-bg: url("${heroBg}")` : undefined}
       >
         <div class="hero-bg" aria-hidden="true" />
+        {hero.videoMp4 && (
+          <video
+            id="heroVideo"
+            class="hero-video"
+            data-mobile={hero.videoOnMobile ? "true" : "false"}
+            muted
+            loop
+            playsinline
+            preload="none"
+            aria-hidden="true"
+          >
+            {hero.videoWebm && (
+              <source src={hero.videoWebm} type="video/webm" />
+            )}
+            <source src={hero.videoMp4} type="video/mp4" />
+          </video>
+        )}
         <div class="hero-overlay" aria-hidden="true" />
         <div class="hero-grain" aria-hidden="true" />
         <div class="container hero-content">
@@ -170,20 +203,68 @@ const testimonials = (data.testimonials?.items ?? [])
             </div>
           </div>
         </div>
-        <div class="scroll-indicator" aria-hidden="true">
-          <div class="scroll-mouse" />
-          <div class="scroll-text">Scroll Down</div>
-        </div>
+        {hero.videoMp4 && (
+          <button
+            id="heroVideoToggle"
+            class="hero-video-toggle"
+            type="button"
+            aria-label="Pause background video"
+            hidden
+          >
+            <i class="fas fa-pause" aria-hidden="true" />
+          </button>
+        )}
       </section>
     )
   }
 
+  <script>
+    const video = document.getElementById(
+      "heroVideo"
+    ) as HTMLVideoElement | null;
+    const toggle = document.getElementById(
+      "heroVideoToggle"
+    ) as HTMLButtonElement | null;
+
+    if (video && toggle) {
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const phone = matchMedia("(max-width: 767px)").matches;
+      const allowPhone = video.dataset.mobile === "true";
+
+      if (!reduce && (!phone || allowPhone)) {
+        video.preload = "auto";
+        video
+          .play()
+          .then(() => {
+            video.classList.add("is-playing");
+            toggle.hidden = false;
+          })
+          .catch(() => {
+            /* autoplay blocked: the image stays */
+          });
+      }
+
+      toggle.addEventListener("click", () => {
+        const icon = toggle.querySelector("i");
+        if (video.paused) {
+          video.play();
+          toggle.setAttribute("aria-label", "Pause background video");
+          icon?.classList.replace("fa-play", "fa-pause");
+        } else {
+          video.pause();
+          toggle.setAttribute("aria-label", "Play background video");
+          icon?.classList.replace("fa-pause", "fa-play");
+        }
+      });
+    }
+  </script>
+
   {
-    trades.length > 0 && (
-      <section class="ticker-banner" aria-label="Trades we serve">
+    tickerItems.length > 0 && (
+      <section class="ticker-banner" aria-label="Businesses we work with">
         <div class="ticker-track">
           <div class="ticker-content">
-            {trades.map((item) => (
+            {tickerItems.map((item) => (
               <div class="ticker-item">
                 <span class="ticker-dot" aria-hidden="true">
                   ✦
@@ -194,7 +275,7 @@ const testimonials = (data.testimonials?.items ?? [])
           </div>
           {/* Identical clone for a seamless loop, hidden from screen readers */}
           <div class="ticker-content" aria-hidden="true">
-            {trades.map((item) => (
+            {tickerItems.map((item) => (
               <div class="ticker-item">
                 <span class="ticker-dot" aria-hidden="true">
                   ✦
@@ -209,7 +290,7 @@ const testimonials = (data.testimonials?.items ?? [])
   }
 
   {
-    intro && services.length > 0 && (
+    intro && cards.length > 0 && (
       <section
         id="services-intro"
         class="features-section"
@@ -222,21 +303,17 @@ const testimonials = (data.testimonials?.items ?? [])
             class="section-header text-center mx-auto"
           />
           <ul class="row g-4 list-unstyled">
-            {services.map((service) => (
+            {cards.map((card) => (
               <li class="col-lg-3 col-md-6">
                 <article class="feature-card">
                   <div class="feature-icon-wrap" aria-hidden="true">
                     <i
-                      class={service.iconName || "fas fa-check"}
+                      class={card.iconName || "fas fa-check"}
                       aria-hidden="true"
                     />
                   </div>
-                  <h3 class="feature-title">{service.title}</h3>
-                  {service.shortDescription && (
-                    <p class="feature-description">
-                      {service.shortDescription}
-                    </p>
-                  )}
+                  <h3 class="feature-title">{card.title}</h3>
+                  {card.text && <p class="feature-description">{card.text}</p>}
                 </article>
               </li>
             ))}

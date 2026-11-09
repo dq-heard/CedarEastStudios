@@ -12,9 +12,11 @@ import { SEO, resolveSeo, type Seo } from "../../sanity/seo";
 import "../../styles/work.css";
 
 const QUERY = `{
-  "hero": *[_type == "pageHero" && page == "work"][0]{ badge, headline, description, ${SEO} },
+  "hero": *[_type == "workPage"][0]{
+    "badge": heroBadge, "headline": heroHeadline, "description": heroDescription, ${SEO}
+  },
   "projects": *[_type == "caseStudy" && defined(slug.current)]
-    | order(year desc, _createdAt desc) ${CASE_CARD_PROJECTION}
+    | order(publishedAt desc, year desc, _createdAt desc) ${CASE_CARD_PROJECTION}
 }`;
 
 interface WorkPageData {

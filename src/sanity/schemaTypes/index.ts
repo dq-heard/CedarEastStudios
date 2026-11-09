@@ -14,6 +14,8 @@ import {
   pageHero,
 } from "./global";
 
+import { siteLayout } from "./layout";
+
 // Pages
 import {
   hero,
@@ -23,11 +25,16 @@ import {
   testimonials,
   news,
 } from "./home";
+import { homePage } from "./pages/homePage";
 import { about, philosophy, founder, techStack } from "./about";
-import { servicesSection, service, pricing, faq } from "./services";
+import { aboutPage } from "./pages/aboutPage";
+import { servicesPage } from "./pages/servicesPage";
+import { service } from "./documents/service";
 import { caseStudy } from "./work";
-import { post } from "./blog";
-import { contact } from "./contact";
+import { workPage } from "./pages/workPage";
+import { blogPage } from "./pages/blogPage";
+import { post } from "./documents/blog";
+import { contactPage } from "./pages/contactPage";
 import { thankYou } from "./thanks";
 import { legalPage } from "./legal";
 
@@ -40,12 +47,14 @@ export const schemaTypes: SchemaTypeDefinition[] = [
 
   // site-wide
   siteSettings,
+  siteLayout,
   navigation,
   prefooter,
   footer,
   pageHero,
 
   // home
+  homePage,
   hero,
   servicesIntro,
   process,
@@ -54,25 +63,29 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   news,
 
   // about
+  aboutPage,
   about,
   philosophy,
   techStack,
   founder,
 
   // services
-  servicesSection,
+  servicesPage,
+  // servicesSection,
   service,
-  pricing,
-  faq,
+  // pricing,
+  // faq,
 
   // work
+  workPage,
   caseStudy,
 
   // blog
+  blogPage,
   post,
 
   // contact
-  contact,
+  contactPage,
   thankYou,
 
   // legal

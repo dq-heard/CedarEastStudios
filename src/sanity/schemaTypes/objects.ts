@@ -7,10 +7,10 @@ import { defineField, defineType } from "sanity";
 // Add a page or deep link here once and every link field gets it.
 export const INTERNAL_LINKS = [
   { title: "Home", value: "/" },
-  { title: "About", value: "/about" },
   { title: "Services", value: "/services" },
   { title: "Services: Pricing", value: "/services#pricing" },
   { title: "Services: FAQ", value: "/services#faq" },
+  { title: "About", value: "/about" },
   { title: "Work", value: "/work" },
   { title: "Blog", value: "/blog" },
   { title: "Contact", value: "/contact" },

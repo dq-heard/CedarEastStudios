@@ -14,7 +14,20 @@ interface Project {
   duration?: string;
   coverImage?: any;
   overview?: string;
+  challenge?: string;
+  approach?: string[];
   result?: string;
+  performance?: {
+    beforeScore?: number;
+    afterScore?: number;
+    note?: string;
+  } | null;
+  testimonial?: {
+    quote?: string;
+    name?: string;
+    role?: string;
+  } | null;
+  gallery?: { _key: string; asset?: any; alt?: string }[];
   liveUrl?: string;
   seo?: Seo | null;
 }
@@ -24,9 +37,11 @@ export async function getStaticPaths() {
   const projects = await client.fetch<
     Project[]
   >(`*[_type == "caseStudy" && defined(slug.current)]
-    | order(year desc, _createdAt desc){
+    | order(publishedAt desc, year desc, _createdAt desc){
     title, "slug": slug.current, category, client, year, duration, coverImage,
-    overview, result, liveUrl, ${SEO}
+    overview, challenge, approach, result, performance, testimonial,
+    "gallery": gallery[]{ _key, asset, alt },
+    liveUrl, ${SEO}
   }`);
   // Each project links to the next one in the list, wrapping around at the end
   return projects.map((project, index) => {
@@ -143,6 +158,61 @@ const overview = project.overview?.replace(/\s+/g, " ").trim();
                 <h2 class="case-heading">Project Overview</h2>
                 <p class="case-text">{project.overview}</p>
               </>
+            )
+          }
+          {
+            project.challenge && (
+              <>
+                <h2 class="case-heading">The Challenge</h2>
+                <p class="case-text">{project.challenge}</p>
+              </>
+            )
+          }
+
+          {
+            project.approach?.length ? (
+              <>
+                <h2 class="case-heading">The Approach</h2>
+                <ul class="case-list">
+                  {project.approach.map((p) => (
+                    <li>{p}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null
+          }
+
+          {
+            project.performance?.beforeScore != null &&
+              project.performance?.afterScore != null && (
+                <aside class="post-takeaway">
+                  <p>
+                    <strong>Mobile performance:</strong>{" "}
+                    {project.performance.beforeScore} to{" "}
+                    {project.performance.afterScore}
+                    {project.performance.note && (
+                      <>
+                        {" "}
+                        <small>({project.performance.note})</small>
+                      </>
+                    )}
+                  </p>
+                </aside>
+              )
+          }
+
+          {
+            project.testimonial?.quote && (
+              <blockquote class="case-quote">
+                <p>{project.testimonial.quote}</p>
+                {project.testimonial.name && (
+                  <footer>
+                    {project.testimonial.name}
+                    {project.testimonial.role &&
+                      `, ${project.testimonial.role}`}
+                  </footer>
+                )}
+              </blockquote>
             )
           }
 

@@ -3,17 +3,52 @@
 // Package options are built from the Pricing document.
 import { defineField, defineType } from "sanity";
 
-export const contact = defineType({
-  name: "contact",
+export const contactPage = defineType({
+  name: "contactPage",
   title: "Contact Page",
   type: "document",
   groups: [
-    { name: "calendar", title: "1. Calendar", default: true },
-    { name: "form", title: "2. Form" },
-    { name: "sidebar", title: "3. Sidebar" },
+    { name: "hero", title: "Hero", default: true },
+    { name: "calendar", title: "Calendar" },
+    { name: "form", title: "Form" },
+    { name: "sidebar", title: "Sidebar" },
   ],
   fields: [
-    // ---- 1. Calendar (the top section) ----
+    // ---- Hero ----
+    defineField({
+      name: "heroBadge",
+      title: "Eyebrow",
+      type: "string",
+      group: "hero",
+    }),
+    defineField({
+      name: "heroHeadline",
+      title: "Headline (h1)",
+      type: "text",
+      rows: 2,
+      group: "hero",
+    }),
+    defineField({
+      name: "heroDescription",
+      title: "Description",
+      type: "text",
+      rows: 3,
+      group: "hero",
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Background Image (optional)",
+      type: "image",
+      options: { hotspot: true },
+      group: "hero",
+    }),
+    defineField({
+      name: "seo",
+      title: "Search & Social (SEO)",
+      type: "seo",
+      group: "hero",
+    }),
+    // ---- Calendar ----
     defineField({
       name: "bookingBadge",
       title: "Calendar Eyebrow",
@@ -39,7 +74,7 @@ export const contact = defineType({
         "e.g. Prefer to talk first? Pick a time for a free intro call.",
     }),
 
-    // ---- 2. Form ----
+    // ---- Form ----
     defineField({
       name: "header",
       title: "Form Section Header",
@@ -63,7 +98,7 @@ export const contact = defineType({
         'Added after the tiers and retainer pulled from Pricing, e.g. "Not sure yet". Do not retype the tiers.',
     }),
 
-    // ---- 3. Sidebar (beside the form) ----
+    // ---- Sidebar (beside the form) ----
     defineField({
       name: "nextStepsTitle",
       title: "What Happens Next: Heading",

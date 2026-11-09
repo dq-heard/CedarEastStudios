@@ -29,17 +29,17 @@ const QUERY = `{
     socials[]{ _key, platform, url },
     seoTitle, seoDescription, ogImage
   },
-  "nav": *[_type == "navigation"][0]{
-    items[]{ _key, label, "href": coalesce(target.external, target.internal) },
-    cta{ label, ${href("target")} }
+  "layout": *[_type == "siteLayout"][0]{
+    "navItems": navItems[]{ _key, label, "href": coalesce(target.external, target.internal) },
+    "navCta": { "label": navCtaLabel, ${href("navCtaTarget")} },
+    "footer": { "brandDescription": footerDescription, bookingButtonText, copyrightText },
+    "prefooter": {
+      "header": prefooterHeader,
+      primaryLabel, "primaryHref": coalesce(primaryLink.external, primaryLink.internal),
+      secondaryLabel, "secondaryHref": coalesce(secondaryLink.external, secondaryLink.internal)
+    }
   },
-  "footer": *[_type == "footer"][0]{ brandDescription, bookingButtonText, copyrightText },
-  "prefooter": *[_type == "prefooter"][0]{
-    header{ badge, title, description },
-    primaryLabel, "primaryHref": coalesce(primaryLink.external, primaryLink.internal),
-    secondaryLabel, "secondaryHref": coalesce(secondaryLink.external, secondaryLink.internal)
-  },
-  "services": *[_type == "service"] | order(coalesce(order, 9999) asc, _createdAt asc)[0...5]{ _id, title },
+  "services": *[_type == "service"] | order(coalesce(order, 9999) asc, _createdAt asc)[0...6]{ _id, title },
   "legal": *[_type == "legalPage" && defined(slug.current)] | order(title asc){ _id, title, "slug": slug.current },
   "hasPosts": count(*[_type == "post" && defined(slug.current)]) > 0,
   "hasWork": count(*[_type == "caseStudy" && defined(slug.current)]) > 0
@@ -54,15 +54,15 @@ async function load() {
       socials: mapSocials(raw.settings?.socials),
     } as Settings,
     nav: {
-      items: (raw.nav?.items ?? []) as {
+      items: (raw.layout?.navItems ?? []) as {
         _key: string;
         label: string;
         href: string;
       }[],
-      cta: raw.nav?.cta as { label?: string; href?: string } | undefined,
+      cta: raw.layout?.navCta as { label?: string; href?: string } | undefined,
     },
-    footer: raw.footer ?? {},
-    prefooter: raw.prefooter ?? null,
+    footer: raw.layout?.footer ?? {},
+    prefooter: raw.layout?.prefooter ?? null,
     services: (raw.services ?? []) as { _id: string; title: string }[],
     legal: (raw.legal ?? []) as { _id: string; title: string; slug: string }[],
     hasPosts: Boolean(raw.hasPosts),

@@ -9,19 +9,23 @@ import { SEO, resolveSeo, type Seo } from "../sanity/seo";
 import { highlight } from "../utils/highlight";
 import "../styles/about.css";
 
-const HEADER = `header{ badge, title, description }`;
+const HDR = (field: string) =>
+  `"header": ${field}{ badge, title, description }`;
+const PAGE = `*[_type == "aboutPage"][0]`;
 
 const QUERY = `{
-  "hero": *[_type == "pageHero" && page == "about"][0]{ badge, headline, description, ${SEO} },
-  "about": *[_type == "about"][0]{
-    ${HEADER}, desc1, desc2,
-    ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal),
-    image
+  "hero": ${PAGE}{
+    "badge": heroBadge, "headline": heroHeadline, "description": heroDescription,
+    ${SEO}
   },
-  "philosophy": *[_type == "philosophy"][0]{ quote, authorName, authorRole, backgroundImage },
-  "tech": *[_type == "techStack"][0]{ ${HEADER}, items[]{ _key, name, iconName, note } },
-  "founder": *[_type == "founder"][0]{
-    ${HEADER}, portrait, isAvailable, availableText, unavailableText,
+  "about": ${PAGE}{
+    ${HDR("studioHeader")}, desc1, desc2,
+    ctaText, "ctaHref": coalesce(ctaLink.external, ctaLink.internal),
+    "image": studioImage
+  },
+  "philosophy": ${PAGE}{ quote, authorName, authorRole, "backgroundImage": philosophyImage },
+  "founder": ${PAGE}{
+    ${HDR("founderHeader")}, portrait, isAvailable, availableText, unavailableText,
     leadText, bioText,
     stats[]{ _key, label, value },
     socialLinks[]{ _key, platform, url }
@@ -49,10 +53,6 @@ interface AboutPageData {
     authorRole?: string;
     backgroundImage?: any;
   } | null;
-  tech?: {
-    header?: Header;
-    items?: { _key: string; name?: string; iconName?: string; note?: string }[];
-  } | null;
   founder?: {
     header?: Header;
     portrait?: any;
@@ -70,7 +70,7 @@ interface AboutPageData {
   } | null;
 }
 
-const { hero, about, philosophy, tech, founder } =
+const { hero, about, philosophy, founder } =
   await client.fetch<AboutPageData>(QUERY);
 
 const aboutImage = about?.image?.asset
@@ -84,8 +84,6 @@ const aboutImage = about?.image?.asset
       alt: about.image.alt ?? "",
     }
   : null;
-
-const tools = (tech?.items ?? []).filter((t) => t.name);
 
 const portrait = founder?.portrait?.asset
   ? {
@@ -189,41 +187,6 @@ const socials = mapSocials(founder?.socialLinks);
               </figcaption>
             )}
           </figure>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    tech && tools.length > 0 && (
-      <section
-        id="tech-stack"
-        class="tech-section"
-        aria-labelledby="tech-title"
-      >
-        <div class="container">
-          <SectionHeader
-            header={tech.header}
-            id="tech-title"
-            class="section-header text-center mx-auto"
-          />
-          <ul class="row g-3 list-unstyled justify-content-center">
-            {tools.map((tool) => (
-              <li class="col-6 col-md-4 col-lg-3">
-                <div class="tech-card">
-                  {tool.iconName && (
-                    <div class="tech-icon" aria-hidden="true">
-                      <i class={tool.iconName} />
-                    </div>
-                  )}
-                  <div>
-                    <h3 class="tech-name">{tool.name}</h3>
-                    {tool.note && <p class="tech-note">{tool.note}</p>}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
     )

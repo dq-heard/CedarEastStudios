@@ -73,8 +73,8 @@ export const siteSettings = defineType({
       ],
     }),
     defineField({
-      name: "tradesServed",
-      title: "Trades Served",
+      name: "tickerItems",
+      title: "Ticker Items",
       type: "array",
       of: [{ type: "string" }],
       description: "Shown in the scrolling ticker on the Home page.",
