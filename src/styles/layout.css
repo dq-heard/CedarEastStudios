@@ -118,6 +118,13 @@
   color: var(--color-primary);
 }
 
+@media (max-width: 325px) {
+  .navbar-brand {
+    font-size: 1.5rem;
+    white-space: nowrap;
+  }
+}
+
 .nav-link {
   display: inline-block;
   font-weight: 500;
@@ -193,19 +200,6 @@
   background: linear-gradient(135deg, #1a1714 0%, #2e1710 55%, #5a2412 100%);
   position: relative;
   overflow: hidden;
-}
-
-.cta-bottom-pattern {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(
-      circle at 15% 50%,
-      rgba(255, 255, 255, 0.12) 0%,
-      transparent 50%
-    ),
-    radial-gradient(circle at 85% 50%, rgba(0, 0, 0, 0.15) 0%, transparent 50%);
-  pointer-events: none;
 }
 
 .cta-bottom-content {

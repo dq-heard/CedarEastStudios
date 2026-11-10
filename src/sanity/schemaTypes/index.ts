@@ -6,36 +6,20 @@ import { link, imageWithAlt, sectionHeader } from "./objects";
 import { seo } from "./seo";
 
 // Site-wide: settings, navigation, footer, prefooter, page heroes
-import {
-  siteSettings,
-  navigation,
-  prefooter,
-  footer,
-  pageHero,
-} from "./global";
-
+import { siteSettings } from "./global";
 import { siteLayout } from "./layout";
 
 // Pages
-import {
-  hero,
-  servicesIntro,
-  process,
-  portfolio,
-  testimonials,
-  news,
-} from "./home";
 import { homePage } from "./pages/homePage";
-import { about, philosophy, founder, techStack } from "./about";
 import { aboutPage } from "./pages/aboutPage";
 import { servicesPage } from "./pages/servicesPage";
 import { service } from "./documents/service";
-import { caseStudy } from "./work";
 import { workPage } from "./pages/workPage";
+import { caseStudy } from "./work";
 import { blogPage } from "./pages/blogPage";
 import { post } from "./documents/blog";
 import { contactPage } from "./pages/contactPage";
-import { thankYou } from "./thanks";
+import { thankYouPage } from "./pages/thanksPage";
 import { legalPage } from "./legal";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -48,33 +32,16 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // site-wide
   siteSettings,
   siteLayout,
-  navigation,
-  prefooter,
-  footer,
-  pageHero,
 
   // home
   homePage,
-  hero,
-  servicesIntro,
-  process,
-  portfolio,
-  testimonials,
-  news,
 
   // about
   aboutPage,
-  about,
-  philosophy,
-  techStack,
-  founder,
 
   // services
   servicesPage,
-  // servicesSection,
   service,
-  // pricing,
-  // faq,
 
   // work
   workPage,
@@ -86,7 +53,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
 
   // contact
   contactPage,
-  thankYou,
+  thankYouPage,
 
   // legal
   legalPage,

@@ -1,12 +1,11 @@
-// /thank-you: where people land after a booking or a form. Not indexed, not in the menu.
 import { defineField, defineType } from "sanity";
 
-const variant = (name: string, title: string) =>
+const variant = (name: string, title: string, group: string) =>
   defineField({
     name,
     title,
     type: "object",
-    options: { collapsible: true, collapsed: false },
+    group,
     fields: [
       defineField({ name: "title", title: "Headline", type: "string" }),
       defineField({
@@ -30,21 +29,27 @@ const variant = (name: string, title: string) =>
     ],
   });
 
-export const thankYou = defineType({
-  name: "thankYou",
+export const thankYouPage = defineType({
+  name: "thankYouPage",
   title: "Thank You Page",
   type: "document",
+  groups: [
+    { name: "booked", title: "After a booking", default: true },
+    { name: "form", title: "After the form" },
+    { name: "link", title: "Link" },
+  ],
   fields: [
-    variant("booked", "After a booking"),
-    variant("form", "After the contact form"),
+    variant("booked", "After a booking", "booked"),
+    variant("form", "After the contact form", "form"),
     defineField({
       name: "linkText",
       title: "Link Text",
       type: "string",
+      group: "link",
       description:
         "One link to read while they wait, such as your best case study. Leave empty to hide it.",
     }),
-    defineField({ name: "link", title: "Link", type: "link" }),
+    defineField({ name: "link", title: "Link", type: "link", group: "link" }),
   ],
   preview: { prepare: () => ({ title: "Thank You Page" }) },
 });
