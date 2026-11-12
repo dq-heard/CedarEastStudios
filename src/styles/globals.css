@@ -8,10 +8,12 @@
 /* ==================== CSS VARIABLES ==================== */
 :root {
   /* --- Brand & Accent Palette (Named for Intent) --- */
-  --cedar: #8c3b2a; /* Deep headings, strong anchor points */
-  --rust: #a94e22; /* Primary CTAs, interactive links (4.9:1) */
-  --burnt-orange: #c4622d; /* Decorative highlights, warm accents */
-  --copper: #b87333; /* Rules, borders, icons, soft highlights */
+  --orange: #b84f09; /* about 4.6:1 on cream, 5.2:1 with white text */
+  --orange-deep: #8f3d06; /* hover */
+  --orange-bright: #ea6a0c; /* fills only: button backgrounds, badges, icon tiles, borders */
+  --honey: #e9a23b; /* Highlights, rules, icons. Never small text on cream (1.9:1) */
+  --butter: #f1d7a1;
+  --herb: #2f5d50; /* Optional cool accent, used sparingly: 6.6:1 on cream */
   --charcoal: #2b2724; /* Deep structural text / dark elements */
 
   /* --- Surfaces & Backgrounds --- */
@@ -24,12 +26,15 @@
   --text-main: #2b2724; /* Charcoal body text (~13:1 contrast) */
   --text-muted: #5a5149; /* Secondary body / captions */
   --text-subtle: #62594f; /* ~4.9:1 on sunken, ~6:1 on cream */
-  --on-primary: #fff; /* text on rust buttons */
+  --on-primary: #fff;
 
   /* --- UI Functional Aliases --- */
-  --color-primary: var(--rust);
-  --color-primary-hover: var(--cedar);
-  --color-accent: var(--copper);
+  --color-primary: var(--orange);
+  --color-primary-hover: var(--orange-deep);
+  --bright-primary: var(--orange-bright);
+  --bright-hover: var(--orange-bright);
+  --color-accent: var(--honey);
+  --hero-accent: var(--butter);
   --border-color: #ddd2be;
   --nav-surface: rgba(247, 240, 227, 0.96);
 
@@ -54,10 +59,10 @@
 
 [data-theme="dark"] {
   /* --- Brand & Accent Palette (Dark Mode Adjustments) --- */
-  --cedar: #ec8a5a;
-  --rust: #d9693a; /* Lightened rust for dark backgrounds */
-  --burnt-orange: #f0a07a;
-  --copper: #c88647;
+  --orange: #f97316; /* 6.4:1 on the dark surface */
+  --orange-deep: #fb923c; /* Lighter on hover in dark mode: 7.9:1 with dark text */
+  --honey: #f2b24d;
+  --herb: #7fb5a1; /* 7.7:1 on the dark surface */
   --charcoal: #151311;
 
   /* --- Surfaces & Backgrounds --- */
@@ -70,12 +75,12 @@
   --text-main: #f3ebdc; /* Inverted cream text */
   --text-muted: #b8ad9d; /* (~8:1 contrast) */
   --text-subtle: #a39a8c; /* ~5.3:1 on sunken, ~6.4:1 on base */
-  --on-primary: #1a1714; /* dark text on the lightened rust (~5:1) */
+  --on-primary: #1a1714; /* Dark text on bright orange, 6.4:1 */
 
   /* --- UI Functional Aliases --- */
-  --color-primary: var(--rust);
-  --color-primary-hover: var(--burnt-orange);
-  --color-accent: var(--copper);
+  --color-primary: var(--orange);
+  --color-primary-hover: var(--orange-deep);
+  --color-accent: var(--honey);
   --border-color: #35302a;
   --nav-surface: rgba(26, 23, 20, 0.96);
 
@@ -132,12 +137,12 @@ h5,
 h6 {
   font-family: var(--font-heading);
   line-height: 1.15;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-main);
   font-style: normal;
   font-variation-settings:
     "WONK" 0,
-    "SOFT" 50;
+    "SOFT" 100;
 }
 
 blockquote {
@@ -175,9 +180,9 @@ section {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--cedar);
+  color: var(--herb);
   padding: 6px 14px;
-  background: color-mix(in srgb, var(--cedar) 10%, transparent);
+  background: color-mix(in srgb, var(--herb) 10%, transparent);
   border-radius: 100px;
   margin-bottom: 16px;
 }
@@ -186,7 +191,7 @@ section {
   content: "";
   width: 6px;
   height: 6px;
-  background: var(--cedar);
+  background: var(--herb);
   border-radius: 50%;
 }
 
@@ -262,18 +267,18 @@ section {
 [data-theme="dark"] .btn-primary {
   --bs-btn-bg: #fff;
   --bs-btn-border-color: #fff;
-  --bs-btn-color: #8c3b2a;
+  --bs-btn-color: #9a3412;
   --bs-btn-hover-bg: var(--text-main);
   --bs-btn-hover-border-color: var(--text-main);
-  --bs-btn-hover-color: #8c3b2a;
+  --bs-btn-hover-color: #9a3412;
   --bs-btn-active-bg: var(--text-main);
   --bs-btn-active-border-color: var(--text-main);
-  --bs-btn-active-color: #8c3b2a;
+  --bs-btn-active-color: #9a3412;
   --bs-btn-active-shadow: none;
 
   background: #fff;
   border: 2px solid #fff;
-  color: #8c3b2a;
+  color: #9a3412;
   font-weight: 700;
 }
 
@@ -282,7 +287,7 @@ section {
 [data-theme="dark"] .btn.btn-primary:active {
   background: var(--text-main);
   border-color: var(--text-main);
-  color: #8c3b2a;
+  color: #9a3412;
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(243, 235, 220, 0.12);
 }

@@ -129,7 +129,7 @@
 }
 
 .hero-title .highlight {
-  color: var(--copper);
+  color: var(--hero-accent);
 }
 
 .hero-description {
@@ -225,11 +225,11 @@
 
 .ticker-dot {
   flex-shrink: 0;
+  color: var(--herb);
 }
 
-.ticker-dot,
 .ticker-item:hover {
-  color: var(--cedar);
+  color: var(--orange-deep);
 }
 
 @keyframes tickerLoop {
@@ -299,6 +299,11 @@
 }
 
 .feature-card:hover .feature-icon-wrap {
+  background: var(--bright-hover);
+  color: var(--on-primary);
+}
+
+[data-theme="dark"].feature-card:hover .feature-icon-wrap {
   background: var(--color-primary);
   color: var(--on-primary);
 }
@@ -350,7 +355,7 @@
 }
 
 .testimonials-section .section-title span {
-  color: var(--burnt-orange, #c4622d);
+  color: var(--honey);
 }
 
 .testimonials-section .section-description {
@@ -425,7 +430,7 @@
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--burnt-orange, #c4622d);
+  border: 2px solid var(--honey);
   flex-shrink: 0;
 }
 
@@ -571,17 +576,11 @@
   top: 64px;
   bottom: 8px;
   width: 2px;
-  background: linear-gradient(var(--color-primary), var(--border-color));
+  background: linear-gradient(var(--bright-primary), var(--border-color));
 }
 
-.process-duration {
-  display: inline-block;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--cedar);
-  margin-bottom: 6px;
+[data-theme="dark"].process-step:not(:last-child)::after {
+  background: linear-gradient(var(--color-primary), var(--border-color));
 }
 
 .process-step-title {
@@ -644,6 +643,15 @@
     bottom: auto;
     width: auto;
     height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--bright-primary),
+      var(--border-color)
+    );
+  }
+
+  [data-theme="dark"].process-timeline--horizontal
+    .process-step:not(:last-child)::after {
     background: linear-gradient(
       90deg,
       var(--color-primary),

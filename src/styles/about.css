@@ -104,7 +104,7 @@
 }
 
 .quote-text .highlight {
-  color: var(--copper);
+  color: var(--hero-accent);
   font-style: italic;
 }
 
@@ -125,58 +125,6 @@
 
 .author-role {
   color: rgba(255, 255, 255, 0.75);
-}
-
-/* ==================== TECH STACK ==================== */
-.tech-section {
-  padding: 100px 0;
-  background: var(--surface-base);
-}
-
-.tech-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  height: 100%;
-  padding: 18px 20px;
-  background: var(--surface-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  transition: var(--transition-smooth);
-}
-
-.tech-card:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
-  box-shadow: var(--shadow-card);
-}
-
-.tech-icon {
-  width: 46px;
-  height: 46px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  border-radius: var(--radius-sm);
-}
-
-.tech-name {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-  color: var(--text-main);
-}
-
-.tech-note {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin: 2px 0 0;
 }
 
 /* ==================== FOUNDER ==================== */
@@ -226,7 +174,7 @@
 }
 
 .badge-dot {
-  --dot-color: #10b981; /* available: green */
+  --dot-color: var(--herb);
   width: 8px;
   height: 8px;
   background: var(--dot-color);
@@ -237,7 +185,7 @@
 
 /* Not available: warm palette color, no pulse (a second cue besides color) */
 .badge-dot.is-unavailable {
-  --dot-color: var(--burnt-orange);
+  --dot-color: var(--honey);
   animation: none;
 }
 

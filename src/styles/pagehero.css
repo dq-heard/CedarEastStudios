@@ -63,7 +63,7 @@
 }
 
 .page-hero-title .highlight {
-  color: var(--copper);
+  color: var(--hero-accent);
 }
 
 .page-hero-description {

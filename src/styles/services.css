@@ -27,10 +27,13 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--color-primary);
+  background: var(--bright-primary);
   transform: scaleX(0);
   transform-origin: left;
   transition: var(--transition-smooth);
+}
+[data-theme="dark"].service-card::before {
+  background: var(--color-primary);
 }
 
 .service-card:hover::before,
@@ -41,11 +44,19 @@
 .service-card:hover,
 .service-card:has(.service-card-link:focus-visible) {
   transform: translateY(-8px);
-  border-color: var(--color-primary);
+  border-color: var(--bright-hover);
   box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.12);
+}
+[data-theme="dark"].service-card:hover,
+[data-theme="dark"].service-card:has(.service-card-link:focus-visible) {
+  border-color: var(--color-primary);
 }
 
 .service-card:has(.service-card-link:focus-visible) {
+  outline: 3px solid var(--bright-hover);
+  outline-offset: 2px;
+}
+[data-theme="dark"].service-card:has(.service-card-link:focus-visible) {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -71,6 +82,9 @@
   transition: var(--transition-smooth);
 }
 .service-card:hover .service-number {
+  color: color-mix(in srgb, var(--bright-hover) 25%, transparent);
+}
+[data-theme="dark"].service-card:hover .service-number {
   color: color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
@@ -88,6 +102,10 @@
   transition: var(--transition-smooth);
 }
 .service-card:hover .service-icon-wrap {
+  background: var(--bright-hover);
+  color: #fff;
+}
+[data-theme="dark"].service-card:hover .service-icon-wrap {
   background: var(--color-primary);
   color: #fff;
 }
@@ -141,10 +159,14 @@
   transition: var(--transition-smooth);
 }
 .service-card:hover .service-arrow {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--bright-hover);
+  border-color: var(--bright-hover);
   color: #fff;
   transform: rotate(-45deg);
+}
+[data-theme="dark"].service-card:hover .service-arrow {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 /* ==================== SERVICE MODAL (native <dialog>) ==================== */
@@ -339,7 +361,7 @@ body:has(.service-modal[open]) {
 }
 
 .featured .pricing-tier {
-  color: var(--cedar);
+  color: var(--orange-deep);
 }
 
 .pricing-prefix {
@@ -403,7 +425,7 @@ body:has(.service-modal[open]) {
   flex-shrink: 0;
   margin-top: 3px;
   font-size: 0.9rem;
-  color: var(--color-primary);
+  color: var(--herb);
 }
 
 .btn-pricing {
@@ -431,16 +453,16 @@ body:has(.service-modal[open]) {
   outline-offset: 2px;
 }
 .pricing-card.featured .btn-pricing {
-  background: var(--cedar);
-  border-color: var(--cedar);
+  background: var(--orange-deep);
+  border-color: var(--orange-deep);
   color: #fff;
 }
 .pricing-card.featured .btn-pricing:hover {
-  background: color-mix(in srgb, var(--cedar) 88%, black);
-  border-color: color-mix(in srgb, var(--cedar) 88%, black);
+  background: color-mix(in srgb, var(--orange-deep) 88%, black);
+  border-color: color-mix(in srgb, var(--orange-deep) 88%, black);
 }
 .pricing-card.featured .btn-pricing:focus-visible {
-  outline: 3px solid var(--cedar);
+  outline: 3px solid var(--orange-deep);
 }
 
 /* Retainer banner */
@@ -456,7 +478,7 @@ body:has(.service-modal[open]) {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--cedar);
+  color: var(--orange-deep);
 }
 .retainer-title {
   margin-bottom: 8px;
@@ -488,19 +510,19 @@ body:has(.service-modal[open]) {
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--cedar);
-  border: 1.5px solid var(--cedar);
+  color: var(--orange-deep);
+  border: 1.5px solid var(--orange-deep);
   border-radius: 100px;
   transition: var(--transition-fast);
 }
 .btn-retainer:hover,
 .btn-retainer:focus-visible {
-  background: var(--cedar);
+  background: var(--orange-deep);
   color: #fff;
   outline: none;
 }
 .btn-retainer:focus-visible {
-  outline: 3px solid var(--cedar);
+  outline: 3px solid var(--orange-deep);
   outline-offset: 2px;
 }
 
@@ -640,7 +662,7 @@ body:has(.service-modal[open]) {
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
-  color: var(--cedar);
+  color: var(--orange-deep);
   transition: gap var(--transition-fast);
 }
 .btn-primary-link:hover,
@@ -648,7 +670,7 @@ body:has(.service-modal[open]) {
   gap: 14px;
 }
 .btn-primary-link:focus-visible {
-  outline: 3px solid var(--cedar);
+  outline: 3px solid var(--orange-deep);
   outline-offset: 4px;
   border-radius: var(--radius-sm);
 }

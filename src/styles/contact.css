@@ -181,8 +181,8 @@ textarea.form-control {
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  background: var(--cedar);
-  border: 1px solid var(--cedar);
+  background: var(--orange-deep);
+  border: 1px solid var(--orange-deep);
   border-radius: 100px;
   cursor: pointer;
   transition:
@@ -191,12 +191,12 @@ textarea.form-control {
 }
 .btn-submit-primary:hover,
 .btn-submit-primary:focus-visible {
-  background: color-mix(in srgb, var(--cedar) 88%, black);
-  border-color: color-mix(in srgb, var(--cedar) 88%, black);
+  background: color-mix(in srgb, var(--orange-deep) 88%, black);
+  border-color: color-mix(in srgb, var(--orange-deep) 88%, black);
   box-shadow: var(--shadow-md);
 }
 .btn-submit-primary:focus-visible {
-  outline: 3px solid var(--cedar);
+  outline: 3px solid var(--orange-deep);
   outline-offset: 3px;
 }
 .btn-submit-primary:disabled {
@@ -298,7 +298,7 @@ textarea.form-control {
   color: var(--text-muted);
 }
 .cal-fallback a {
-  color: var(--cedar);
+  color: var(--orange-deep);
   text-underline-offset: 3px;
 }
 

@@ -36,12 +36,12 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // home
   homePage,
 
-  // about
-  aboutPage,
-
   // services
   servicesPage,
   service,
+
+  // about
+  aboutPage,
 
   // work
   workPage,

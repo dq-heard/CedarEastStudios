@@ -37,7 +37,7 @@ const QUERY = `{
   "tickerItems": *[_type == "siteSettings"][0].tickerItems,
   "process": ${HOME}{
     ${HEADER("processHeader")},
-    "steps": processSteps[]{ _key, title, duration, description }
+    "steps": processSteps[]{ _key, title, description }
   },
   "intro": ${HOME}{
     ${HEADER("introHeader")},
@@ -78,7 +78,6 @@ interface HomeData {
     steps?: {
       _key: string;
       title?: string;
-      duration?: string;
       description?: string;
     }[];
   } | null;
@@ -353,9 +352,6 @@ const testimonials = (data.testimonials?.items ?? [])
           >
             {processSteps.map((step) => (
               <li class="process-step">
-                {step.duration && (
-                  <div class="process-duration">{step.duration}</div>
-                )}
                 <h3 class="process-step-title">{step.title}</h3>
                 {step.description && (
                   <p class="process-step-description">{step.description}</p>

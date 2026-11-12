@@ -197,7 +197,7 @@
 /* ==================== BOTTOM CTA (prefooter) ==================== */
 .cta-bottom-section {
   padding: 120px 0;
-  background: linear-gradient(135deg, #1a1714 0%, #2e1710 55%, #5a2412 100%);
+  background: linear-gradient(135deg, #14181a 0%, #1a2622 55%, #22362f 100%);
   position: relative;
   overflow: hidden;
 }
@@ -215,6 +215,10 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
+.cta-badge::before {
+  background: var(--orange-deep);
+}
+
 .cta-bottom-title {
   font-family: var(--font-heading);
   font-size: clamp(2.1rem, 4vw, 3.2rem);
@@ -227,9 +231,10 @@
 
 .cta-highlight {
   text-decoration: none;
+  color: var(--color-primary);
   background-image: linear-gradient(
-    color-mix(in srgb, currentColor 30%, transparent),
-    color-mix(in srgb, currentColor 30%, transparent)
+    color-mix(in srgb, white 30%, transparent),
+    color-mix(in srgb, white 30%, transparent)
   );
   background-repeat: no-repeat;
   background-size: 95% 0.06em;
