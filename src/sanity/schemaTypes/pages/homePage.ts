@@ -38,13 +38,25 @@ export const homePage = defineType({
     }),
     defineField({
       name: "ctaText",
-      title: "Button Text",
+      title: "Primary Button Text",
       type: "string",
       group: "hero",
     }),
     defineField({
       name: "ctaLink",
-      title: "Button Link",
+      title: "Primary Button Link",
+      type: "link",
+      group: "hero",
+    }),
+    defineField({
+      name: "ctaText2",
+      title: "Secondary Button Text",
+      type: "string",
+      group: "hero",
+    }),
+    defineField({
+      name: "ctaLink2",
+      title: "Secondary Button Link",
       type: "link",
       group: "hero",
     }),

@@ -457,6 +457,12 @@
 }
 
 .scroll-top-btn:hover {
+  background: var(--bright-hover);
+  color: #fff;
+  border-color: var(--bright-hover);
+  transform: translateY(-3px);
+}
+[data-theme="dark"].scroll-top-btn:hover {
   background: var(--color-primary-hover);
   color: #fff;
   border-color: var(--color-primary-hover);

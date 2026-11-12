@@ -140,6 +140,11 @@
 .portfolio-item:hover .portfolio-action-badge,
 .portfolio-item:focus-visible .portfolio-action-badge {
   opacity: 1;
+  background: var(--bright-hover);
+}
+[data-theme="dark"].portfolio-item:hover .portfolio-action-badge,
+[data-theme="dark"].portfolio-item:focus-visible .portfolio-action-badge {
+  opacity: 1;
   background: var(--color-primary);
 }
 
