@@ -20,6 +20,8 @@ if (!PUBLIC_SANITY_PROJECT_ID) {
   );
 }
 
+const EXCLUDED = ["/studio", "/thank-you", "/404"];
+
 export default defineConfig({
   site: "https://www.cedareaststudios.com",
   trailingSlash: "never",
@@ -32,7 +34,10 @@ export default defineConfig({
       useCdn: false,
     }),
     react(),
-    sitemap({ filter: (page) => !page.includes("/studio", "/thank-you") }),
+    sitemap({
+      filter: (page) =>
+        !EXCLUDED.some((path) => new URL(page).pathname.startsWith(path)),
+    }),
   ],
   env: {
     schema: {
