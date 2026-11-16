@@ -92,6 +92,12 @@
 
 /* ==================== NAVBAR ==================== */
 #navbar {
+  --bs-navbar-color: var(--text-muted);
+  --bs-navbar-hover-color: var(--text-main);
+  --bs-navbar-active-color: var(--text-main);
+  --bs-navbar-brand-color: var(--text-main);
+  --bs-navbar-brand-hover-color: var(--text-main);
+
   background: var(--nav-surface);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -110,7 +116,10 @@
   font-family: var(--font-heading);
   font-size: 1.75rem;
   font-weight: 900;
-  color: var(--text-main) !important;
+  color: var(--text-main);
+  font-variation-settings:
+    "WONK" 0,
+    "SOFT" 100;
   letter-spacing: -1px;
 }
 

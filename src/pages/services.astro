@@ -191,7 +191,7 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                       <div class="pricing-popular-badge">{tier.popularBadgeText}</div>
                     )}
                     <h3 class="pricing-tier">{tier.tierName}</h3>
-                    {value && (
+                    {/* {value && (
                       <div class="pricing-price-wrapper">
                         {tier.pricePrefix && <span class="pricing-prefix">{tier.pricePrefix}</span>}
                         <div class="pricing-amount-group">
@@ -199,7 +199,7 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                           <span class="pricing-amount">{value}</span>
                         </div>
                       </div>
-                    )}
+                    )} */}
                     {tier.description && <p class="pricing-description">{tier.description}</p>}
                     <div class="pricing-divider" aria-hidden="true"></div>
                     {features.length > 0 && (
@@ -230,12 +230,12 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                     {retainer.description && <p class="retainer-desc">{retainer.description}</p>}
                   </div>
                   <div class="col-lg-5 text-lg-end">
-                    {formatPrice(retainer.price) && (
+                    {/* {formatPrice(retainer.price) && (
                       <div class="retainer-price">
                         <span class="retainer-amt">{formatPrice(retainer.price)}</span>{" "}
                         <span class="retainer-per">{formatPeriod(retainer.interval)}</span>
                       </div>
-                    )}
+                    )} */}
                     {retainer.ctaText && retainer.ctaHref && (
                       <a href={retainer.ctaHref} class="btn-retainer mt-3">{retainer.ctaText}</a>
                     )}
