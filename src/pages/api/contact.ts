@@ -21,14 +21,28 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const wantsJson = request.headers.get("accept")?.includes("application/json");
 
   // Forms submitted without JavaScript get sent back to the page with a status
-  const reply = (ok: boolean, error?: string, status = ok ? 200 : 400) =>
+  const reply = (
+    ok: boolean,
+    error?: string,
+    status = ok ? 200 : 400,
+    leadId?: string
+  ) =>
     wantsJson
-      ? new Response(JSON.stringify(ok ? { ok: true } : { ok: false, error }), {
-          status,
-          headers: { "Content-Type": "application/json" },
-        })
+      ? new Response(
+          JSON.stringify(
+            ok
+              ? { ok: true, ...(leadId ? { leadId } : {}) }
+              : { ok: false, error }
+          ),
+          {
+            status,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
       : redirect(
-          ok ? "/thank-you?type=form" : "/contact?status=error#send-message",
+          ok && leadId
+            ? `/thank-you?type=form&lead_id=${encodeURIComponent(leadId)}`
+            : "/contact?status=error#send-message",
           303
         );
 
@@ -108,5 +122,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     console.error("Resend error", res.status, await res.text());
     return reply(false, "Your message couldn't be sent right now.", 502);
   }
-  return reply(true);
+  const leadId = crypto.randomUUID();
+  return reply(true, undefined, 200, leadId);
 };

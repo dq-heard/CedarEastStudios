@@ -32,7 +32,7 @@ const variants = [
 const showLink = Boolean(data?.linkText && data?.linkHref);
 ---
 
-<Layout title="Thank you" noindex hideCta>
+<Layout title="Thank You" noindex hideCta>
   <section class="thanks-section" aria-labelledby="thanks-title">
     <div class="container">
       {
@@ -82,18 +82,54 @@ const showLink = Boolean(data?.linkText && data?.linkHref);
 </Layout>
 
 <script>
-  // Show the matching version; the form version is the default
-  const type =
-    new URLSearchParams(location.search).get("type") === "booking"
-      ? "booking"
-      : "form";
+  const params = new URLSearchParams(location.search);
+
+  const type = params.get("type") === "booking" ? "booking" : "form";
+
+  const leadId = params.get("lead_id");
+
+  // Show the matching thank-you card
   const cards = document.querySelectorAll<HTMLElement>("[data-thanks]");
   const match = [...cards].some((c) => c.dataset.thanks === type);
+
   cards.forEach((c) => {
     c.hidden = match ? c.dataset.thanks !== type : false;
   });
-  // Hand the lead to analytics code: listen for "lead" on window
-  window.dispatchEvent(new CustomEvent("lead", { detail: { type } }));
+
+  // Only track a successful conversion with a unique ID
+  if (leadId) {
+    const storageKey = `cedareast-lead-${type}-${leadId}`;
+
+    try {
+      if (localStorage.getItem(storageKey)) {
+        console.info("Lead already tracked:", leadId);
+      } else {
+        // Mark it before sending to GTM to prevent refresh duplicates
+        localStorage.setItem(storageKey, "1");
+
+        const dataLayer = ((window as any).dataLayer =
+          (window as any).dataLayer || []);
+
+        dataLayer.push({
+          event: "lead_conversion",
+          lead_source: type,
+          lead_id: leadId,
+        });
+      }
+    } catch (error) {
+      // If browser storage is unavailable, still send the event
+      const dataLayer = ((window as any).dataLayer =
+        (window as any).dataLayer || []);
+
+      dataLayer.push({
+        event: "lead_conversion",
+        lead_source: type,
+        lead_id: leadId,
+      });
+    }
+  } else {
+    console.info("No lead ID. Conversion not tracked.");
+  }
 </script>
 
 <style>
@@ -122,6 +158,7 @@ const showLink = Boolean(data?.linkText && data?.linkHref);
   }
   .thanks-title {
     margin: 0 0 12px;
+    font-weight: 500;
     font-family: var(--font-heading);
     font-size: clamp(1.8rem, 4.5vw, 2.6rem);
     color: var(--text-main);
@@ -137,6 +174,7 @@ const showLink = Boolean(data?.linkText && data?.linkHref);
   }
   .thanks-block h2 {
     margin: 0 0 4px;
+    font-weight: 500;
     font-family: var(--font-heading);
     font-size: 1rem;
     text-transform: uppercase;

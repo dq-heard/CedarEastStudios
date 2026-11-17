@@ -263,8 +263,10 @@ const hasSidebar = Boolean(
           headers: { Accept: "application/json" },
         });
         const result = await res.json().catch(() => null);
-        if (res.ok && result?.ok) {
-          location.assign("/thank-you?type=form");
+        if (res.ok && result?.ok && result?.leadId) {
+          location.assign(
+            `/thank-you?type=form&lead_id=${encodeURIComponent(result.leadId)}`
+          );
           return;
         } else {
           show("error", result?.error ?? "Something went wrong.");
@@ -348,7 +350,18 @@ const hasSidebar = Boolean(
     // After a booking, send them to the thank-you page (the lead is counted there)
     Cal("on", {
       action: "bookingSuccessfulV2",
-      callback: () => location.assign("/thank-you?type=booking"),
+      callback: (e: any) => {
+        const bookingUid = e?.detail?.data?.uid;
+
+        if (!bookingUid) {
+          console.error("Cal.com booking ID was not received:", e);
+          return;
+        }
+
+        location.assign(
+          `/thank-you?type=booking&lead_id=${encodeURIComponent(bookingUid)}`
+        );
+      },
     });
   };
 
