@@ -2,11 +2,13 @@
 import { formatPeriod, formatPrice } from "./price";
 
 export const PRICING_REFS_PROJECTION = `{
+  "showPrices": *[_type == "siteSettings"][0].showPrices,
   "tiers": tiers[]{ tierName, "key": key.current, price },
   "retainer": retainer{ title, price, interval }
 }`;
 
 export interface PricingRefs {
+  showPrices?: boolean;
   tiers?: { tierName?: string; key?: string; price?: number }[];
   retainer?: { title?: string; price?: number; interval?: string };
 }
@@ -45,20 +47,23 @@ export const fillTokens = (
 
 // "Growth (from $4,495)", then "Care & Content Plan ($249 / month)"
 export function packageOptionLabels(p?: PricingRefs | null) {
+  const show = p?.showPrices === true;
   const labels: string[] = [];
   for (const tier of p?.tiers ?? []) {
     if (!tier.tierName) continue;
     labels.push(
-      typeof tier.price === "number"
+      show && typeof tier.price === "number"
         ? `${tier.tierName} (from ${formatPrice(tier.price)})`
         : tier.tierName
     );
   }
   const r = p?.retainer;
   if (r?.title) {
-    const price = [formatPrice(r.price), formatPeriod(r.interval)]
-      .filter(Boolean)
-      .join(" ");
+    const price = show
+      ? [formatPrice(r.price), formatPeriod(r.interval)]
+          .filter(Boolean)
+          .join(" ")
+      : "";
     labels.push(price ? `${r.title} (${price})` : r.title);
   }
   return labels;

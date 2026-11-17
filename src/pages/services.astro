@@ -17,6 +17,7 @@ const HREF = (field: string) =>
 const PAGE = `*[_type == "servicesPage"][0]`;
 
 const QUERY = `{
+  "showPrices": *[_type == "siteSettings"][0].showPrices,
   "hero": ${PAGE}{
     "badge": heroBadge, "headline": heroHeadline, "description": heroDescription,
     ${SEO}
@@ -42,6 +43,7 @@ const QUERY = `{
 }`;
 
 interface ServicesPageData {
+  showPrices?: boolean | null;
   hero?: { badge?: string; headline?: string; description?: string; seo?: Seo | null } | null;
   intro?: { header?: Header } | null;
   services?: {
@@ -66,6 +68,7 @@ interface ServicesPageData {
 
 const [data, site] = await Promise.all([client.fetch<ServicesPageData>(QUERY), getSite()]);
 const { hero, intro, services: rawServices, pricing, faq } = data;
+const showPrices = data.showPrices === true;
 
 // FAQ answers can use price tokens such as {{growth.price}}
 const tokens = buildPriceTokens({ tiers: pricing?.tiers, retainer: pricing?.retainer ?? undefined });
@@ -175,14 +178,14 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
   )}
 
   {showPricing && (
-    <section id="pricing" class="pricing-section" aria-labelledby="pricing-title">
+    <section id="pricing" class:list={["pricing-section", { "has-prices": showPrices }]} aria-labelledby="pricing-title">
       <div class="container">
         <SectionHeader header={pricing?.header} id="pricing-title" class="section-header text-center mx-auto" />
 
         {tiers.length > 0 && (
           <div class="row g-4 justify-content-center align-items-stretch mb-5">
             {tiers.map((tier) => {
-              const { symbol, value } = formatPriceParts(tier.price);
+              const { symbol, value } = formatPriceParts(showPrices ? tier.price : undefined);
               const features = (tier.features ?? []).filter(Boolean);
               return (
                 <div class="col-lg-4 col-md-6">
@@ -191,7 +194,7 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                       <div class="pricing-popular-badge">{tier.popularBadgeText}</div>
                     )}
                     <h3 class="pricing-tier">{tier.tierName}</h3>
-                    {/* {value && (
+                    {value && (
                       <div class="pricing-price-wrapper">
                         {tier.pricePrefix && <span class="pricing-prefix">{tier.pricePrefix}</span>}
                         <div class="pricing-amount-group">
@@ -199,7 +202,7 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                           <span class="pricing-amount">{value}</span>
                         </div>
                       </div>
-                    )} */}
+                    )}
                     {tier.description && <p class="pricing-description">{tier.description}</p>}
                     <div class="pricing-divider" aria-hidden="true"></div>
                     {features.length > 0 && (
@@ -230,12 +233,12 @@ const showPricing = tiers.length > 0 || Boolean(retainer);
                     {retainer.description && <p class="retainer-desc">{retainer.description}</p>}
                   </div>
                   <div class="col-lg-5 text-lg-end">
-                    {/* {formatPrice(retainer.price) && (
+                    {showPrices && formatPrice(retainer.price) && (
                       <div class="retainer-price">
                         <span class="retainer-amt">{formatPrice(retainer.price)}</span>{" "}
                         <span class="retainer-per">{formatPeriod(retainer.interval)}</span>
                       </div>
-                    )} */}
+                    )}
                     {retainer.ctaText && retainer.ctaHref && (
                       <a href={retainer.ctaHref} class="btn-retainer mt-3">{retainer.ctaText}</a>
                     )}

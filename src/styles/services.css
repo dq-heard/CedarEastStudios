@@ -349,19 +349,24 @@ body:has(.service-modal[open]) {
   border-radius: 100px;
 }
 
+/* No prices: the layout you have now */
 .pricing-tier {
-  /* margin-bottom: 16px; */
-  /* font-family: inherit; */
-  /* font-size: 0.82rem; */
   font-weight: 700;
-  /* line-height: 1.2; */
-  /* letter-spacing: 0.12em; */
-  /* text-transform: uppercase; */
-  /* color: var(--color-primary); */
   font-size: 1.28rem;
   line-height: 1.3;
   margin-bottom: 12px;
   color: var(--text-main);
+}
+
+/* With prices: the old rules, only when the switch is on */
+.has-prices .pricing-tier {
+  margin-bottom: 16px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
 }
 
 .featured .pricing-tier {

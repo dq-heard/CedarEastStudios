@@ -80,6 +80,14 @@ export const siteSettings = defineType({
       description: "Shown in the scrolling ticker on the Home page.",
     }),
     defineField({
+      name: "showPrices",
+      title: "Show prices on the site?",
+      type: "boolean",
+      initialValue: false,
+      description:
+        "Off: package prices are hidden everywhere (cards, banner, contact form, FAQ). On: they appear again.",
+    }),
+    defineField({
       name: "seoTitle",
       title: "Default Meta Title",
       type: "string",
