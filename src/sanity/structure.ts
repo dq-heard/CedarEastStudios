@@ -1,78 +1,75 @@
-// src/sanity/structure.ts  (the Studio sidebar, grouped by site page)
-import type { StructureResolver } from "sanity/structure";
+import type {
+  StructureBuilder,
+  StructureResolver,
+  StructureResolverContext,
+} from "sanity/structure";
+import { pageTypes, singletonTypes } from "../sanity/schemaTypes/singletons";
 
-// Documents that exist exactly once. They open the editor directly instead of a list.
-const SINGLETON_TYPES_BY_PAGE = {
-  site: [
-    ["siteSettings", "Site Settings"],
-    ["navigation", "Navigation"],
-    ["footer", "Footer"],
-    ["prefooter", "Prefooter (CTA)"],
-  ],
-  home: [
-    ["hero", "Hero"],
-    ["servicesIntro", "Services Intro"],
-    ["process", "Process"],
-    ["portfolio", "Work Section Header"],
-    ["testimonials", "Testimonials"],
-    ["news", "News Section Header"],
-  ],
-  about: [
-    ["about", "About"],
-    ["philosophy", "Philosophy"],
-    ["techStack", "Tech Stack"],
-    ["founder", "Founder"],
-  ],
-  services: [
-    ["servicesSection", "Page Header"],
-    ["pricing", "Pricing"],
-    ["faq", "FAQ"],
-  ],
-  contact: [
-    ["contact", "Contact Page"],
-    ["thankYou", "Thank-You Page"],
-  ],
-} satisfies Record<string, [type: string, title: string][]>;
+type Ordering = { field: string; direction: "asc" | "desc" }[];
 
-export const SINGLETON_TYPES: string[] = Object.values(
-  SINGLETON_TYPES_BY_PAGE
-).flatMap((group) => group.map(([type]) => type));
+/** A document that opens straight to its editor. Title comes from the schema. */
+const singleton = (
+  S: StructureBuilder,
+  context: StructureResolverContext,
+  type: string
+) =>
+  S.listItem()
+    .title(context.schema.get(type)?.title ?? type)
+    .id(type)
+    .child(S.document().schemaType(type).documentId(type));
 
-export const structure: StructureResolver = (S) => {
-  const singleton = ([type, title]: readonly [string, string]) =>
-    S.listItem()
-      .title(title)
-      .id(type)
-      .child(S.document().schemaType(type).documentId(type));
-
-  const group = (title: string, items: ReturnType<typeof singleton>[]) =>
-    S.listItem().title(title).child(S.list().title(title).items(items));
-
-  const { site, home, about, services, contact } = SINGLETON_TYPES_BY_PAGE;
-
-  return S.list()
-    .title("Content")
-    .items([
-      group("Site-wide", [
-        ...site.map(singleton),
-        S.documentTypeListItem("pageHero").title("Page Heroes"),
-      ]),
-      S.divider(),
-      group("Home", home.map(singleton)),
-      group("About", about.map(singleton)),
-      group("Services", [
-        ...services.slice(0, 1).map(singleton),
-        S.documentTypeListItem("service").title("Services"),
-        ...services.slice(1).map(singleton),
-      ]),
-      group("Work", [S.documentTypeListItem("caseStudy").title("Projects")]),
-      group("Blog", [S.documentTypeListItem("post").title("Posts")]),
-      group("Contact", contact.map(singleton)),
-      S.divider(),
-      S.documentTypeListItem("legalPage").title("Legal Pages"),
-    ]);
+/** A list of every document of one type. */
+const collection = (
+  S: StructureBuilder,
+  title: string,
+  type: string,
+  ordering?: Ordering
+) => {
+  const list = S.documentTypeList(type).title(title);
+  return S.listItem()
+    .title(title)
+    .schemaType(type)
+    .child(ordering ? list.defaultOrdering(ordering) : list);
 };
 
-// In sanity.config.ts, stop editors from creating or deleting the singletons:
-//   schema: { types: schemaTypes, templates: (t) => t.filter(({ schemaType }) => !SINGLETON_TYPES.includes(schemaType)) },
-//   document: { actions: (input, ctx) => SINGLETON_TYPES.includes(ctx.schemaType) ? input.filter(({ action }) => action && ["publish","discardChanges","restore"].includes(action)) : input },
+// Types listed explicitly below. Anything else still shows at the bottom,
+// so a new schema is never hidden by accident.
+const grouped = ["service", "caseStudy", "post", "legalPage"];
+
+export const structure: StructureResolver = (S, context) =>
+  S.list()
+    .title("Content")
+    .items([
+      singleton(S, context, "siteSettings"),
+      singleton(S, context, "siteLayout"),
+      S.listItem()
+        .title("Pages")
+        .child(
+          S.list()
+            .title("Pages")
+            .items(pageTypes.map((type: string) => singleton(S, context, type)))
+        ),
+      S.divider(),
+
+      collection(S, "Services", "service", [
+        { field: "order", direction: "asc" },
+      ]),
+      collection(S, "Case Studies", "caseStudy", [
+        { field: "publishedAt", direction: "desc" },
+      ]),
+      collection(S, "Blog Posts", "post", [
+        { field: "publishedAt", direction: "desc" },
+      ]),
+      collection(S, "Legal Pages", "legalPage", [
+        { field: "title", direction: "asc" },
+      ]),
+
+      ...S.documentTypeListItems().filter((item) => {
+        const id = item.getId();
+        return (
+          id &&
+          !(singletonTypes as readonly string[]).includes(id) &&
+          !grouped.includes(id)
+        );
+      }),
+    ]);

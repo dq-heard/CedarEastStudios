@@ -12,7 +12,8 @@ import { SEO, resolveSeo, type Seo } from "../../sanity/seo";
 import "../../styles/blog.css";
 
 const QUERY = `{
-  "hero": *[_type == "pageHero" && page == "blog"][0]{ badge, headline, description, ${SEO} },
+  "hero": *[_type == "blogPage"][0]{
+  "badge": heroBadge, "headline": heroHeadline, "description": heroDescription, ${SEO}},
   "posts": *[_type == "post" && defined(slug.current)]
     | order(publishedAt desc) ${POST_CARD_PROJECTION}
 }`;

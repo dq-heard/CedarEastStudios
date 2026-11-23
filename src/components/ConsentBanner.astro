@@ -1,0 +1,122 @@
+<div
+  id="consentBanner"
+  class="consent-banner"
+  role="region"
+  aria-label="Cookie choices"
+  hidden
+>
+  <p class="consent-text">
+    I use cookies for site statistics and to measure my ads. Nothing loads until
+    you choose.{" "}
+    <a href="/privacy-policy">Privacy Policy</a>
+  </p>
+  <div class="consent-actions">
+    <button type="button" class="btn btn-outline" data-consent="denied"
+      >Decline</button
+    >
+    <button type="button" class="btn btn-outline" data-consent="granted"
+      >Accept</button
+    >
+  </div>
+</div>
+
+<script>
+  const banner = document.getElementById("consentBanner");
+
+  // GTM needs the real `arguments` object pushed, not an array, so this has to be a
+  // regular function (not an arrow). The rest parameter keeps TypeScript happy.
+  function gtag(..._args: unknown[]) {
+    (window as any).dataLayer = (window as any).dataLayer || [];
+    (window as any).dataLayer.push(arguments);
+  }
+
+  const send = (v: "granted" | "denied") =>
+    gtag("consent", "update", {
+      ad_storage: v,
+      ad_user_data: v,
+      ad_personalization: v,
+      analytics_storage: v,
+    });
+
+  const saved = (() => {
+    try {
+      return localStorage.getItem("ceConsent");
+    } catch {
+      return null;
+    }
+  })();
+  if (!saved && banner) banner.hidden = false;
+
+  document.addEventListener("click", (e) => {
+    const t = e.target as HTMLElement;
+    const choice = t.closest<HTMLElement>("[data-consent]")?.dataset.consent as
+      "granted" | "denied" | undefined;
+    if (choice) {
+      send(choice);
+      try {
+        localStorage.setItem("ceConsent", choice);
+      } catch {}
+      if (banner) banner.hidden = true;
+    }
+    // Footer link: "Cookie settings"
+    if (t.closest("[data-open-consent]") && banner) {
+      banner.hidden = false;
+      banner.querySelector<HTMLElement>("button")?.focus();
+    }
+  });
+</script>
+
+<style>
+  .consent-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1000;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 760px;
+    margin-inline: auto;
+    padding: 16px 20px;
+    background: var(--surface-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevated);
+  }
+  .consent-banner[hidden] {
+    display: none;
+  }
+  .consent-text {
+    margin: 0;
+    flex: 1 1 280px;
+    font-size: 0.92rem;
+  }
+  .consent-text a {
+    text-decoration: underline;
+  }
+  .consent-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .consent-actions .btn {
+    padding: 10px 22px;
+    font-weight: 600;
+    background: transparent;
+    color: var(--text-main);
+    border: 2px solid var(--text-main);
+  }
+  .consent-actions .btn:hover,
+  .consent-actions .btn:focus-visible {
+    background: var(--text-main);
+    color: var(--surface-card);
+  }
+  .consent-actions .btn:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+</style>
