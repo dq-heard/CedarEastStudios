@@ -124,19 +124,43 @@ const socials = settings.socials ?? [];
         &copy; {new Date().getFullYear()}{" "}{settings.agencyName}.{" "}
         {footer.copyrightText}
       </div>
-      {
-        legal.length > 0 && (
-          <nav aria-label="Legal">
-            <ul class="footer-bottom-links list-unstyled mb-0">
-              {legal.map((page) => (
-                <li>
-                  <a href={`/${page.slug}`}>{page.title}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )
-      }
+
+      <nav aria-label="Legal">
+        <ul class="footer-bottom-links list-unstyled mb-0">
+          {
+            legal.map((page) => (
+              <li>
+                <a href={`/${page.slug}`}>{page.title}</a>
+              </li>
+            ))
+          }
+          <li>
+            <button type="button" class="footer-link-button" data-open-consent>
+              Cookie Settings
+            </button>
+          </li>
+          <li>
+            <button type="button" class="footer-link-button" data-back-to-top>
+              Back to Top ↑
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </footer>
+
+<script>
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  document
+    .querySelector("[data-back-to-top]")
+    ?.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: reduced.matches ? "auto" : "smooth",
+      });
+      (document.getElementById("page-top") as HTMLElement | null)?.focus({
+        preventScroll: true,
+      });
+    });
+</script>

@@ -179,7 +179,8 @@ const jsonLdText = jsonLd
     <!-- End Google Tag Manager -->
   </head>
   <body>
-    <a class="visually-hidden-focusable" href="#main">Skip to content</a>
+    <div id="page-top" tabindex="-1"></div>
+    <a class="visually-hidden-focusable" href="#main">Skip to Content</a>
     <Topbar settings={settings} />
     <Navbar site={site} />
     <main id="main">
@@ -188,7 +189,6 @@ const jsonLdText = jsonLd
     {!hideCta && <Prefooter data={site.prefooter} />}
     <Footer site={site} />
     <ConsentBanner />
-    <ScrollTop />
     <Cursor />
   </body>
 </html>

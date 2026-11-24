@@ -110,14 +110,14 @@
   margin: 1.8em 0 0.6em;
 }
 
-.post-body a {
-  color: var(--color-primary);
-  text-underline-offset: 3px;
+.post-body a:not(.btn) {
+  color: var(--link-color);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
-
-.post-body a:hover,
-.post-body a:focus-visible {
-  color: var(--color-primary-hover);
+.post-body a:not(.btn):hover,
+.post-body a:not(.btn):focus-visible {
+  text-decoration-thickness: 2px;
 }
 
 .post-body ul,

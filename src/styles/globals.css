@@ -17,10 +17,12 @@
   --charcoal: #2b2724; /* Deep structural text / dark elements */
 
   /* --- Surfaces & Backgrounds --- */
+  --nav-surface: rgba(247, 240, 227, 0.96);
   --surface-base: #f7f0e3; /* Main warm cream background */
   --surface-raised: #efe6d5; /* Secondary panels, hovered rows */
   --surface-sunken: #e4d9c4; /* Inputs, deep wells, nested cards */
   --surface-card: #fffcf6; /* Crisp card surface */
+  --frame-dark: #070710; /* topbar and footer: darker than any content surface, both themes */
 
   /* --- Typography --- */
   --text-main: #2b2724; /* Charcoal body text (~13:1 contrast) */
@@ -35,8 +37,8 @@
   --bright-hover: var(--orange-bright);
   --color-accent: var(--honey);
   --hero-accent: var(--butter);
+  --link-color: var(--orange-deep);
   --border-color: #ddd2be;
-  --nav-surface: rgba(247, 240, 227, 0.96);
 
   /* --- Shadows (Depth & Elevation) --- */
   --shadow-subtle: 0 2px 15px rgba(43, 39, 36, 0.07);
@@ -66,6 +68,7 @@
   --charcoal: #151311;
 
   /* --- Surfaces & Backgrounds --- */
+  --nav-surface: rgba(26, 23, 20, 0.96);
   --surface-base: #1a1714; /* Warm charcoal surface */
   --surface-raised: #221e1a; /* Secondary panels */
   --surface-sunken: #2c2722; /* Deep wells */
@@ -82,7 +85,6 @@
   --color-primary-hover: var(--orange-deep);
   --color-accent: var(--honey);
   --border-color: #35302a;
-  --nav-surface: rgba(26, 23, 20, 0.96);
 
   /* --- Shadows (Dark Mode Adjustments) --- */
   --shadow-subtle: 0 2px 15px rgba(0, 0, 0, 0.25);
@@ -285,11 +287,14 @@ section {
 [data-theme="dark"] .btn.btn-primary:hover,
 [data-theme="dark"] .btn.btn-primary:focus-visible,
 [data-theme="dark"] .btn.btn-primary:active {
-  background: var(--text-main);
-  border-color: var(--text-main);
   color: #9a3412;
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(243, 235, 220, 0.12);
+  box-shadow: 0 12px 36px rgba(249, 115, 22, 0.35);
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 3px;
 }
 
 /* Secondary: glass outline */
@@ -303,7 +308,8 @@ section {
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
-    transform var(--transition-fast);
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .btn-secondary:hover,
@@ -312,7 +318,13 @@ section {
   border-color: #ffffff;
   color: #ffffff;
   transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.12);
   outline: none;
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 @media (max-width: 991.98px) {

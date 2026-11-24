@@ -1,6 +1,10 @@
 /* Site-wide chrome: topbar, navbar, bottom CTA, footer, scroll-to-top, cursor.
    Imported by Layout.astro after globals.css (variables, base, buttons, modals). */
 
+/* ==================== SKIP CONTENT ==================== */
+.visually-hidden-focusable {
+  outline-offset: 3px;
+}
 /* ==================== TOPBAR ==================== */
 .topbar {
   background: var(--charcoal);
@@ -11,7 +15,7 @@
 }
 
 [data-theme="dark"] .topbar {
-  background: #070710;
+  background: var(--frame-dark);
 }
 
 .topbar-contact a {
@@ -69,8 +73,8 @@
 }
 
 .theme-toggle-btn:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 .theme-icon-wrap {
@@ -127,6 +131,10 @@
   color: var(--color-primary);
 }
 
+.navbar-brand:focus-visible {
+  border-radius: 6px;
+}
+
 @media (max-width: 325px) {
   .navbar-brand {
     font-size: 1.5rem;
@@ -147,21 +155,21 @@
   color: var(--text-muted);
 }
 
-.nav-link:hover,
 .nav-link.active {
-  color: var(--text-main) !important;
-  background-color: var(--surface-sunken) !important;
+  color: var(--herb) !important;
+  background: color-mix(in srgb, var(--herb) 10%, transparent);
   font-weight: 600;
 }
 
-.nav-link:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+.nav-link:not(.btn-primary):hover {
+  color: var(--text-main);
+  background-color: var(--surface-sunken);
+  font-weight: 600;
 }
 
 .nav-link.btn-primary {
-  padding: 10px 22px !important;
-  border-radius: 100px !important;
+  padding: 10px 22px;
+  border-radius: 100px;
 }
 
 .nav-link.btn-primary:hover {
@@ -175,13 +183,18 @@
   border-radius: var(--radius-sm);
 }
 
-.navbar-toggler:focus {
+.navbar .nav-link:focus-visible,
+.navbar-brand:focus-visible,
+.navbar-toggler:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
   box-shadow: none;
+  /* border-radius: 6px; */
 }
 
-.navbar-toggler:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+/* Bootstrap also styles the toggler on plain :focus */
+.navbar-toggler:focus {
+  box-shadow: none;
 }
 
 .navbar-toggler-wrap {
@@ -262,7 +275,7 @@
 
 /* ==================== FOOTER ==================== */
 .footer-section {
-  background: #070710;
+  background: var(--frame-dark);
   padding: 90px 0 0;
   color: rgba(255, 255, 255, 0.65);
 }
@@ -409,23 +422,43 @@
   gap: 20px;
 }
 
-.footer-bottom-links a {
-  font-size: 0.82rem;
+.footer-bottom-links a,
+.footer-link-button {
+  font-size: 0.82rem !important;
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
-.footer-bottom-links a:hover,
-.footer-bottom-links a:focus-visible {
-  outline: none;
+.footer-link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .footer-copyright,
-.footer-bottom-links a {
+.footer-bottom-links a,
+.footer-link-button {
   color: #c9bfb0;
-} /* ~10:1 on #151311 */
-.footer-bottom-links a:hover {
+} /* ~11:1 on #070710 */
+.footer-bottom-links a:hover,
+.footer-link-button:hover {
   color: #fff;
+}
+
+.footer-socials a:focus-visible,
+.footer-links a:focus-visible,
+.footer-contact-link:focus-visible,
+.footer-brand:focus-visible,
+.footer-bottom-links a:focus-visible,
+.footer-link-button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.footer-socials a:focus-visible {
+  border-radius: 50%;
 }
 
 @media (max-width: 767px) {
@@ -434,53 +467,6 @@
     align-items: center;
     text-align: center;
   }
-}
-
-/* ==================== SCROLL TO TOP ==================== */
-.scroll-top-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 48px;
-  height: 48px;
-  background: var(--surface-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 9996;
-  box-shadow: var(--shadow-card);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: var(--transition-smooth);
-}
-
-.scroll-top-btn.is-visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.scroll-top-btn:hover {
-  background: var(--bright-hover);
-  color: #fff;
-  border-color: var(--bright-hover);
-  transform: translateY(-3px);
-}
-[data-theme="dark"].scroll-top-btn:hover {
-  background: var(--color-primary-hover);
-  color: #fff;
-  border-color: var(--color-primary-hover);
-  transform: translateY(-3px);
-}
-
-.scroll-top-btn:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
 }
 
 /* ==================== CUSTOM CURSOR ==================== */

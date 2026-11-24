@@ -1,0 +1,70 @@
+<button
+  id="scrollTopBtn"
+  class="scroll-top-btn"
+  type="button"
+  aria-label="Scroll to top of page"
+>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</button>
+
+<script>
+  const btn = document.getElementById("scrollTopBtn");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  const update = () =>
+    btn?.classList.toggle("is-visible", window.scrollY > 300);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+
+  btn?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: reduced.matches ? "auto" : "smooth" });
+  });
+</script>
+
+<style>
+  .scroll-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px;
+    height: 48px;
+    background: var(--surface-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9996;
+    box-shadow: var(--shadow-card);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: var(--transition-smooth);
+  }
+
+  .scroll-top-btn.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .scroll-top-btn:hover {
+    background: var(--bright-hover);
+    color: #fff;
+    border-color: var(--bright-hover);
+    transform: translateY(-3px);
+  }
+  [data-theme="dark"].scroll-top-btn:hover {
+    background: var(--color-primary-hover);
+    color: #fff;
+    border-color: var(--color-primary-hover);
+    transform: translateY(-3px);
+  }
+
+  .scroll-top-btn:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+</style>

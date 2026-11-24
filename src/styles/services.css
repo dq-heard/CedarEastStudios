@@ -671,7 +671,7 @@ body:has(.service-modal[open]) {
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
-  color: var(--orange-deep);
+  color: var(--link-color);
   transition: gap var(--transition-fast);
 }
 .btn-primary-link:hover,
@@ -679,7 +679,7 @@ body:has(.service-modal[open]) {
   gap: 14px;
 }
 .btn-primary-link:focus-visible {
-  outline: 3px solid var(--orange-deep);
+  outline: 3px solid var(--link-color);
   outline-offset: 4px;
   border-radius: var(--radius-sm);
 }
