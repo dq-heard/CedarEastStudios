@@ -76,6 +76,13 @@ const cover = project.coverImage?.asset
     }
   : null;
 
+const gallery = (project.gallery ?? [])
+  .filter((img) => img.asset)
+  .map((img) => ({
+    url: urlFor(img).width(1000).height(750).fit("max").auto("format").url(),
+    alt: img.alt || `Screenshot from ${project.title}`,
+  }));
+
 const meta = [
   { label: "Client", value: project.client },
   { label: "Category", value: project.category },
@@ -183,25 +190,6 @@ const overview = project.overview?.replace(/\s+/g, " ").trim();
           }
 
           {
-            project.performance?.beforeScore != null &&
-              project.performance?.afterScore != null && (
-                <aside class="post-takeaway">
-                  <p>
-                    <strong>Mobile performance:</strong>{" "}
-                    {project.performance.beforeScore} to{" "}
-                    {project.performance.afterScore}
-                    {project.performance.note && (
-                      <>
-                        {" "}
-                        <small>({project.performance.note})</small>
-                      </>
-                    )}
-                  </p>
-                </aside>
-              )
-          }
-
-          {
             project.testimonial?.quote && (
               <blockquote class="case-quote">
                 <p>{project.testimonial.quote}</p>
@@ -226,6 +214,30 @@ const overview = project.overview?.replace(/\s+/g, " ").trim();
             )
           }
 
+          <!-- {
+            gallery.length > 0 && (
+              <>
+                <h2 class="case-heading">Screens</h2>
+                <ul class="case-gallery list-unstyled">
+                  {gallery.map((img) => (
+                    <li>
+                      <figure>
+                        <img
+                          src={img.url}
+                          alt={img.alt}
+                          width="1000"
+                          height="750"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </figure>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
+          } -->
+
           {
             project.liveUrl && (
               <p class="mt-4">
@@ -235,7 +247,7 @@ const overview = project.overview?.replace(/\s+/g, " ").trim();
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Visit live site
+                  Visit Live Site
                   <i
                     class="fas fa-arrow-up-right-from-square"
                     aria-hidden="true"

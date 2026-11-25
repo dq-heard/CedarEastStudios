@@ -15,18 +15,28 @@ interface Props {
 }
 const { hero } = Astro.props;
 const { settings } = await getSite();
-const bg = settings.pageHeroImage
-  ? urlFor(settings.pageHeroImage).width(2000).auto("format").url()
-  : null;
+
+const hasBg = Boolean(settings.pageHeroImage?.asset);
 ---
 
 {
   hero?.headline && (
-    <section
-      class="page-hero"
-      style={bg ? `--page-hero-bg: url("${bg}")` : undefined}
-    >
-      <div class="page-hero-bg" aria-hidden="true" />
+    <section class="page-hero">
+      {hasBg && (
+        <img
+          class="page-hero-bg"
+          src={urlFor(settings.pageHeroImage)
+            .width(960)
+            .quality(70)
+            .auto("format")
+            .url()}
+          width="960"
+          height="640"
+          fetchpriority="high"
+          decoding="async"
+          aria-hidden="true"
+        />
+      )}
       <div class="page-hero-overlay" aria-hidden="true" />
       <div class="container page-hero-content">
         {hero.badge && (
