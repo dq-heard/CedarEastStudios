@@ -160,19 +160,18 @@ const testimonials = (data.testimonials?.items ?? [])
   {
     hero && (
       <section id="hero" class="hero-section">
-        {hasHeroBg && (
-          <img
-            class="hero-bg"
-            src={heroImg(1200)}
-            srcset={`${heroImg(640)} 640w, ${heroImg(1200)} 1200w, ${heroImg(1920)} 1920w`}
-            sizes="100vw"
-            width="1920"
-            height="1080"
-            fetchpriority="high"
-            decoding="async"
-            alt=""
-          />
-        )}
+        <img
+          class="hero-bg"
+          src={heroImg(1200)}
+          srcset={`${heroImg(640)} 640w, ${heroImg(1200)} 1200w, ${heroImg(1920)} 1920w`}
+          sizes="100vw"
+          width="1920"
+          height="1080"
+          fetchpriority="high"
+          decoding="async"
+          aria-hidden="true"
+        />
+
         {hero.videoMp4 && (
           <video
             id="heroVideo"
