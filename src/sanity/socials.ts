@@ -2,19 +2,16 @@
 // FontAwesome class. Nobody types icon class names in Studio.
 
 const SOCIALS: Record<string, { label: string; iconName: string }> = {
-  twitter: { label: "Twitter / X", iconName: "fab fa-twitter" },
   linkedin: { label: "LinkedIn", iconName: "fab fa-linkedin-in" },
-  instagram: { label: "Instagram", iconName: "fab fa-instagram" },
   facebook: { label: "Facebook", iconName: "fab fa-facebook-f" },
-  dribbble: { label: "Dribbble", iconName: "fab fa-dribbble" },
+  instagram: { label: "Instagram", iconName: "fab fa-instagram" },
+  threads: { label: "Threads", iconName: "fab fa-threads" },
   github: { label: "GitHub", iconName: "fab fa-github" },
   website: { label: "Website", iconName: "fas fa-arrow-up-right-from-square" },
 };
 
 // Older free-text entries ("X", "Twitter / X") still resolve
 const ALIASES: Record<string, string> = {
-  x: "twitter",
-  twitterx: "twitter",
   site: "website",
   personalwebsite: "website",
   portfolio: "website",
